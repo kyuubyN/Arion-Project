@@ -11,6 +11,10 @@ ARION_RUNTIME_TOKEN="$(python3 -c 'import secrets; print(secrets.token_hex(32))'
 ARION_DESKTOP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 ARION_DESKTOP_FILE="$ARION_DESKTOP_DIR/io.github.kyuubyn.arion.desktop"
 
+# Desktop launchers inherit an arbitrary working directory from GNOME. Keep
+# every relative build and fallback path anchored to the project checkout.
+cd "$ARION_DIR"
+
 mkdir -p "$ARION_DESKTOP_DIR"
 ARION_DESKTOP_EXEC="$(printf '%s' "$ARION_DIR/arion-launcher.sh" | sed 's/[&|]/\\&/g')"
 ARION_DESKTOP_ICON="$(printf '%s' "$ARION_DIR/assets/icon.png" | sed 's/[&|]/\\&/g')"
