@@ -156,7 +156,7 @@ func callWebsiteProviderWithClient(callContext context.Context, installation Pro
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
-	request.Header.Set("User-Agent", "Arion/0.4 provider-protocol/1")
+	request.Header.Set("User-Agent", "Arion/0.4.1 provider-protocol/1")
 	response, err := client.Do(request)
 	if err != nil {
 		if callContext.Err() != nil {

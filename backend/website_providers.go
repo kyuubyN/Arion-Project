@@ -59,7 +59,7 @@ func probeWebsiteProviderWithClient(ctx context.Context, rawURL string, client *
 		return WebsiteProviderCandidate{}, err
 	}
 	request.Header.Set("Accept", "application/arion-provider+json, application/json")
-	request.Header.Set("User-Agent", "Arion/0.4 provider-protocol/1")
+	request.Header.Set("User-Agent", "Arion/0.4.1 provider-protocol/1")
 	response, err := client.Do(request)
 	if err != nil {
 		return WebsiteProviderCandidate{}, fmt.Errorf("could not read the website provider manifest: %w", err)

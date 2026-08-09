@@ -2,22 +2,22 @@
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "name": "arion-media-gallery@0.4.0",
-  "documentNamespace": "http://spdx.org/spdxdocs/arion-media-gallery-0.4.0-38836ba5-d934-4f0a-991f-24c5b724a7e0",
+  "name": "arion-media-gallery@0.4.1",
+  "documentNamespace": "http://spdx.org/spdxdocs/arion-media-gallery-0.4.1-ab8f3ffa-9d4a-4283-b74f-f30adce297bf",
   "creationInfo": {
-    "created": "2026-08-09T19:42:26.424Z",
+    "created": "2026-08-09T20:11:33.589Z",
     "creators": [
       "Tool: npm/cli-10.8.2"
     ]
   },
   "documentDescribes": [
-    "SPDXRef-Package-arion-media-gallery-0.4.0"
+    "SPDXRef-Package-arion-media-gallery-0.4.1"
   ],
   "packages": [
     {
       "name": "arion-media-gallery",
-      "SPDXID": "SPDXRef-Package-arion-media-gallery-0.4.0",
-      "versionInfo": "0.4.0",
+      "SPDXID": "SPDXRef-Package-arion-media-gallery-0.4.1",
+      "versionInfo": "0.4.1",
       "packageFileName": "",
       "description": "Galeria de mídia local, privada e extensível",
       "primaryPackagePurpose": "LIBRARY",
@@ -29,7 +29,7 @@
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:npm/arion-media-gallery@0.4.0"
+          "referenceLocator": "pkg:npm/arion-media-gallery@0.4.1"
         }
       ]
     },
@@ -6569,17 +6569,17 @@
   "relationships": [
     {
       "spdxElementId": "SPDXRef-DOCUMENT",
-      "relatedSpdxElement": "SPDXRef-Package-arion-media-gallery-0.4.0",
+      "relatedSpdxElement": "SPDXRef-Package-arion-media-gallery-0.4.1",
       "relationshipType": "DESCRIBES"
     },
     {
       "spdxElementId": "SPDXRef-Package-electron-43.3.0",
-      "relatedSpdxElement": "SPDXRef-Package-arion-media-gallery-0.4.0",
+      "relatedSpdxElement": "SPDXRef-Package-arion-media-gallery-0.4.1",
       "relationshipType": "DEV_DEPENDENCY_OF"
     },
     {
       "spdxElementId": "SPDXRef-Package-electron-builder-26.15.3",
-      "relatedSpdxElement": "SPDXRef-Package-arion-media-gallery-0.4.0",
+      "relatedSpdxElement": "SPDXRef-Package-arion-media-gallery-0.4.1",
       "relationshipType": "DEV_DEPENDENCY_OF"
     },
     {

@@ -99,7 +99,7 @@ func validateRemoteProvider(ctx context.Context, rawURL string, client *http.Cli
 		return validationReport{}, err
 	}
 	request.Header.Set("Accept", "application/arion-provider+json, application/json")
-	request.Header.Set("User-Agent", "Arion-Provider-Validator/0.4")
+	request.Header.Set("User-Agent", "Arion-Provider-Validator/0.4.1")
 	response, err := client.Do(request)
 	if err != nil {
 		return validationReport{}, fmt.Errorf("manifest request failed: %w", err)
@@ -156,7 +156,7 @@ func callRPC(ctx context.Context, client *http.Client, rpcURL, id, method string
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
-	request.Header.Set("User-Agent", "Arion-Provider-Validator/0.4")
+	request.Header.Set("User-Agent", "Arion-Provider-Validator/0.4.1")
 	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("%s request failed: %w", method, err)

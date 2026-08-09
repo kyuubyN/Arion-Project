@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing tag to publish
+        required: true
+        default: v0.4.1
 
 permissions:
   contents: write
@@ -38,8 +44,8 @@ jobs:
             dist/Arion-*.tar.gz
             dist/SHA256SUMS-linux.txt
 
-  windows:
-    runs-on: windows-latest
+  windows-portable:
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
@@ -53,24 +59,22 @@ jobs:
       - run: npm ci
       - run: go test ./...
       - run: npm run check
-      - run: npm run dist:windows
+      - run: npm run dist:windows-portable
       - name: Create checksum
-        shell: pwsh
+        shell: bash
         run: |
-          Get-FileHash dist/Arion-Setup-*.exe, dist/Arion-Portable-*.exe -Algorithm SHA256 |
-            ForEach-Object { "{0}  {1}" -f $_.Hash.ToLower(), (Split-Path $_.Path -Leaf) } |
-            Set-Content dist/SHA256SUMS-windows.txt
+          cd dist
+          sha256sum Arion-Portable-*.exe > SHA256SUMS-windows.txt
       - uses: actions/upload-artifact@v4
         with:
           name: arion-windows-x64
           if-no-files-found: error
           path: |
-            dist/Arion-Setup-*.exe
             dist/Arion-Portable-*.exe
             dist/SHA256SUMS-windows.txt
 
   publish:
-    needs: [linux, windows]
+    needs: [linux, windows-portable]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v5
@@ -81,9 +85,10 @@ jobs:
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: >-
-          gh release create "$GITHUB_REF_NAME" release-assets/*
+          gh release create "$RELEASE_TAG" release-assets/*
           --repo "$GITHUB_REPOSITORY"
           --verify-tag
           --generate-notes
-          --title "Arion ${GITHUB_REF_NAME}"
+          --title "Arion ${RELEASE_TAG}"

@@ -1,7 +1,7 @@
 {
   "name": "arion-media-gallery",
   "productName": "Arion",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "description": "Galeria de mídia local, privada e extensível",
   "author": "KЯØNE / kyuubyn",
