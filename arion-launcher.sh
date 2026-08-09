@@ -38,11 +38,17 @@ if [ ! -f "$ARION_BACKEND_BIN" ] || find "$ARION_DIR/backend" -name '*.go' -newe
   "$ARION_GO_BIN" build -o "$ARION_BACKEND_BIN" ./backend
 fi
 
-ARION_ELECTRON_BIN="$ARION_DIR/node_modules/.bin/electron"
-if [ -x "$ARION_ELECTRON_BIN" ]; then
+ARION_ELECTRON_RUNTIME="$ARION_DIR/node_modules/electron/dist/electron"
+ARION_ELECTRON_CLI="$ARION_DIR/node_modules/.bin/electron"
+if [ -x "$ARION_ELECTRON_RUNTIME" ]; then
   # Some automation environments export ELECTRON_RUN_AS_NODE. Arion always
-  # needs the real Chromium runtime here.
-  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_BIN" "$ARION_DIR"
+  # needs the real Chromium runtime here. Launching the native executable also
+  # avoids depending on an NVM-managed `node` that GNOME does not add to PATH.
+  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_RUNTIME" "$ARION_DIR"
+  exit $?
+fi
+if [ -x "$ARION_ELECTRON_CLI" ] && command -v node >/dev/null 2>&1; then
+  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_CLI" "$ARION_DIR"
   exit $?
 fi
 
