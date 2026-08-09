@@ -1,149 +1,148 @@
 <div align="center">
-<img src="./assets/icon.png" alt="Ícone" width="140">
+
+**Language / Idioma:** [Português](READMEBR.md) | English
+
+<img src="./assets/icon.png" alt="Icon" width="140">
 
 # Arion
 
-**Galeria de mídia local, privada e extensível para desktop.**
+**A local, private, and extensible media gallery for desktop.**
 
-Arion organiza vídeos armazenados no computador em coleções e define um protocolo neutro (`arion-provider.json` + JSON-RPC 2.0) para que provedores de metadados — locais ou web — sejam escolhidos e conectados pelo próprio usuário.
+Arion organizes videos stored on your computer into collections and defines a neutral protocol (`arion-provider.json` + JSON-RPC 2.0) so metadata providers — local or web-based — can be chosen and connected by the user.
 
-O núcleo **não** embute catálogo de fontes, **não** recomenda serviços de terceiros e **não** envia a biblioteca para nuvem alguma.
+The core **does not** bundle a source catalog, **does not** recommend third-party services, and **does not** send your library to any cloud.
 
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 [![Releases](https://img.shields.io/badge/releases-linux%20%7C%20windows-informational)](https://github.com/kyuubyN/Arion-Project/releases)
 
 </div>
 
----
+## Table of contents
 
-## Sumário
+- [Current state](#current-state)
+- [Architecture overview](#architecture-overview)
+- [Requirements](#requirements)
+- [Running in development](#running-in-development)
+- [Tests and verification](#tests-and-verification)
+- [Local data](#local-data)
+- [Providers](#providers)
+- [Documentation](#documentation)
+- [License](#license)
 
-- [Estado atual](#estado-atual)
-- [Arquitetura em resumo](#arquitetura-em-resumo)
-- [Requisitos](#requisitos)
-- [Executar em desenvolvimento](#executar-em-desenvolvimento)
-- [Testes e verificação](#testes-e-verificação)
-- [Dados locais](#dados-locais)
-- [Provedores](#provedores)
-- [Documentação](#documentação)
-- [Licença](#licença)
+## Current state
 
----
-
-## Estado atual
-
-| Área | Detalhe |
+| Area | Detail |
 |---|---|
-| Projeto | Módulo Go independente |
-| Biblioteca | Modelo genérico de coleções e itens de mídia |
-| Descoberta local | Varredura de vídeos com **FFprobe**, geração de thumbnails com **FFmpeg** |
-| Reprodução | HTML5, **MPV** e **Celluloid** |
-| Provedores locais | Descoberta e execução via `arion-provider.json` + **JSON-RPC 2.0** |
-| Provedores web | Opt-in, manifesto HTTPS padronizado — sem scraping de URLs arbitrárias |
-| Kit de desenvolvimento | Kit Go público, servidor neutro de exemplo e validador de conformidade para provedores web |
-| Busca | Unificada em três estágios: biblioteca imediata → prévia rápida → enriquecimento completo via provedores |
-| Capas externas | Validação anti-SSRF, limite de tamanho/taxa e cache local |
-| API | Local, autenticada por **token efêmero** por sessão |
-| Telemetria | Inexistente — desativada por definição, não por configuração |
-| Shell desktop | Electron/Chromium com sessões web **isoladas** para a aba `Web Videos` |
-| Fallback | GTK 3 / WebKit2GTK quando o runtime Electron não está instalado |
-| Empacotamento | Pacotes x64 para Linux e Windows, incluindo executável portátil Windows |
+| Project | Independent Go module |
+| Library | Generic model for collections and media items |
+| Local discovery | Video scanning with **FFprobe**, thumbnail generation with **FFmpeg** |
+| Playback | HTML5, **MPV**, and **Celluloid** |
+| Local providers | Discovery and execution via `arion-provider.json` + **JSON-RPC 2.0** |
+| Web providers | Opt-in, standardized HTTPS manifest — no scraping of arbitrary URLs |
+| Development kit | Public Go kit, neutral sample server, and compliance validator for web providers |
+| Search | Unified in three stages: immediate library results → quick preview → full enrichment from providers |
+| External covers | Anti-SSRF validation, size/rate limiting, and local caching |
+| API | Local, authenticated by an **ephemeral token** per session |
+| Telemetry | Nonexistent — disabled by design, not by configuration |
+| Desktop shell | Electron/Chromium with **isolated** web sessions for the `Web Videos` tab |
+| Fallback | GTK 3 / WebKit2GTK when the Electron runtime isn't installed |
+| Packaging | x64 packages for Linux and Windows, including a portable Windows executable |
 
-## Arquitetura em resumo
+## Architecture overview
 
 ```
 ┌─────────────┐      JSON-RPC 2.0       ┌──────────────────────┐
-│   Núcleo Go  │ ◄─────────────────────► │ Provedores locais     │
-│  (biblioteca,│      arion-provider.json│ (processo próprio)    │
-│   API local, │                         └──────────────────────┘
-│   cache)     │      HTTPS + manifesto  ┌──────────────────────┐
-│              │ ◄─────────────────────► │ Provedores web         │
-└──────┬───────┘      /.well-known/...   │ (opt-in por domínio)   │
+│   Go Core    │ ◄─────────────────────► │ Local providers        │
+│  (library,   │      arion-provider.json│ (own process)          │
+│   local API, │                         └──────────────────────┘
+│   cache)     │      HTTPS + manifest   ┌──────────────────────┐
+│              │ ◄─────────────────────► │ Web providers           │
+└──────┬───────┘      /.well-known/...   │ (opt-in per domain)     │
        │                                 └──────────────────────┘
-       │ Token efêmero (API local)
+       │ Ephemeral token (local API)
        ▼
 ┌─────────────┐
-│ Shell Electron/Chromium │ ── fallback ── GTK3/WebKit2GTK
-│ (UI, sessões isoladas)  │
+│ Electron/Chromium shell │ ── fallback ── GTK3/WebKit2GTK
+│ (UI, isolated sessions) │
 └─────────────┘
 ```
 
-- **Núcleo Go**: dono da biblioteca, do cache de miniaturas/capas e da API local autenticada.
-- **Provedores**: processos ou serviços externos, descobertos apenas por manifesto — o núcleo nunca acessa uma origem sem manifesto válido.
-- **Shell**: camada de apresentação; a aba `Web Videos` roda em sessões Chromium isoladas do restante do app.
+- **Go core**: owns the library, the thumbnail/cover cache, and the authenticated local API.
+- **Providers**: external processes or services, discovered only through a manifest — the core never contacts an origin without a valid manifest.
+- **Shell**: presentation layer; the `Web Videos` tab runs in Chromium sessions isolated from the rest of the app.
 
-Detalhes completos em [Arquitetura](docs/architecture.md) e [Modelo de dados](docs/data-model.md).
+Full details in [Architecture](docs/architecture.md) and [Data model](docs/data-model.md).
 
-## Requisitos
+## Requirements
 
-| Componente | Necessário para | Obrigatório |
+| Component | Needed for | Required |
 |---|---|---|
-| Go 1.22+ | Build do núcleo | Sim |
-| Node.js | Build/execução do shell Electron | Sim |
-| FFmpeg / FFprobe | Metadados e miniaturas de vídeo | Recomendado |
-| GTK 3 / WebKit2GTK | Fallback quando o Electron não está instalado | Somente no fallback |
+| Go 1.22+ | Building the core | Yes |
+| Node.js | Building/running the Electron shell | Yes |
+| FFmpeg / FFprobe | Video metadata and thumbnails | Recommended |
+| GTK 3 / WebKit2GTK | Fallback when Electron isn't installed | Fallback only |
 
-## Executar em desenvolvimento
+## Running in development
 
 ```bash
 npm install
 ./arion-launcher.sh
 ```
 
-No Windows, use o instalador ou o executável portátil publicados para a versão desejada em [Releases](https://github.com/kyuubyN/Arion-Project/releases).
+On Windows, use the installer or the portable executable published for the desired version in [Releases](https://github.com/kyuubyN/Arion-Project/releases).
 
-Para requisitos detalhados, caminhos de dados por plataforma e instruções de compilação, veja [Instalação e desenvolvimento](docs/installation.md).
+For detailed requirements, per-platform data paths, and build instructions, see [Installation and development](docs/installation.md).
 
-## Testes e verificação
+## Tests and verification
 
 ```bash
-go test ./...          # testes unitários/integração do núcleo Go
-go vet ./...            # análise estática do código Go
-node --check frontend/app.js   # validação sintática do frontend
-npm run sbom             # geração da SBOM do projeto
+go test ./...          # unit/integration tests for the Go core
+go vet ./...            # static analysis of the Go code
+node --check frontend/app.js   # frontend syntax validation
+npm run sbom             # project SBOM generation
 ```
 
-## Dados locais
+## Local data
 
-| Tipo de dado | Caminho |
+| Data type | Path |
 |---|---|
-| Configurações e catálogo | `~/.config/arion` |
-| Miniaturas | `~/.cache/arion` |
+| Settings and catalog | `~/.config/arion` |
+| Thumbnails | `~/.cache/arion` |
 
-Arion indexa **apenas** pastas explicitamente autorizadas pelo usuário. Os arquivos de mídia nunca são copiados, movidos ou enviados para fora da máquina.
+Arion indexes **only** folders explicitly authorized by the user. Media files are never copied, moved, or uploaded off the machine.
 
-## Provedores
+## Providers
 
-Um provedor só é reconhecido pelo seu **manifesto**, nunca por heurística ou URL solta:
+A provider is recognized solely by its **manifest**, never by heuristics or a loose URL:
 
-- **Provedores locais**: descobertos e executados via `arion-provider.json` e chamadas JSON-RPC 2.0.
-- **Provedores web**: precisam expor `/.well-known/arion-provider.json` em HTTPS. Colar uma URL comum na interface não concede privilégio algum nem dispara scraping — sem manifesto válido, não há integração.
+- **Local providers**: discovered and executed via `arion-provider.json` and JSON-RPC 2.0 calls.
+- **Web providers**: must expose `/.well-known/arion-provider.json` over HTTPS. Pasting a plain URL into the interface grants no privilege and triggers no scraping — without a valid manifest, there is no integration.
 
-O núcleo **não contém integrações específicas de terceiros**. Adaptadores compatíveis são desenvolvidos fora do repositório do Arion e conversam com ele exclusivamente pelo protocolo público.
+The core **contains no third-party-specific integrations**. Compatible adapters are developed outside the Arion repository and communicate with it exclusively through the public protocol.
 
-Referências técnicas:
+Technical references:
 
-- [Protocolo de provedores (local)](docs/provider-protocol.md)
-- [Protocolo de provedores web](docs/website-provider-protocol.md)
-- [Política de provedores](PROVIDER_POLICY.md)
-- [Kit de desenvolvimento de provedores](docs/provider-development-kit.md)
+- [Provider protocol (local)](docs/provider-protocol.md)
+- [Web provider protocol](docs/website-provider-protocol.md)
+- [Provider policy](PROVIDER_POLICY.md)
+- [Provider development kit](docs/provider-development-kit.md)
 
-## Documentação
+## Documentation
 
-| Documento | Conteúdo |
+| Document | Content |
 |---|---|
-| [Arquitetura](docs/architecture.md) | Componentes internos e fluxo de dados |
-| [Instalação e desenvolvimento](docs/installation.md) | Requisitos, build e caminhos por plataforma |
-| [Modelo de dados](docs/data-model.md) | Esquema de coleções, itens e metadados |
-| [Protocolo de provedores web](docs/website-provider-protocol.md) | Especificação do manifesto HTTPS |
-| [Kit de desenvolvimento de provedores](docs/provider-development-kit.md) | SDK Go, servidor de exemplo e validador de conformidade |
-| [Segurança do modo web](docs/security/web-mode.md) | Isolamento de sessões e superfície de ataque do shell |
-| [Segurança de provedores](docs/security/providers.md) | Modelo de confiança e mitigação de SSRF |
-| [Prova de reinstalação](docs/reclone-proof.md) | Verificação de reprodutibilidade do build |
-| [Checklist de lançamento](docs/release-checklist.md) | Passos para publicar uma release |
+| [Architecture](docs/architecture.md) | Internal components and data flow |
+| [Installation and development](docs/installation.md) | Requirements, build, and per-platform paths |
+| [Data model](docs/data-model.md) | Schema for collections, items, and metadata |
+| [Web provider protocol](docs/website-provider-protocol.md) | HTTPS manifest specification |
+| [Provider development kit](docs/provider-development-kit.md) | Go SDK, sample server, and compliance validator |
+| [Web mode security](docs/security/web-mode.md) | Session isolation and shell attack surface |
+| [Provider security](docs/security/providers.md) | Trust model and SSRF mitigation |
+| [Reclone proof](docs/reclone-proof.md) | Build reproducibility verification |
+| [Release checklist](docs/release-checklist.md) | Steps to publish a release |
 
-## Licença
+## License
 
-Arion é software livre sob a [GNU General Public License v3.0 only](LICENSE). Componentes reaproveitados e dependências mantêm seus próprios avisos em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Arion is free software under the [GNU General Public License v3.0 only](LICENSE). Reused components and dependencies retain their own notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-<sub>Transparência: algumas imagens da identidade visual do Arion foram geradas ou transformadas com auxílio de IA a partir de materiais originais do projeto.</sub>
+<sub>Transparency: some images in Arion's visual identity were generated or transformed with AI assistance from the project's original materials.</sub>
