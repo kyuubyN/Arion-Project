@@ -33,7 +33,7 @@ const webViews = new Map();
 app.setName('Arion');
 if (process.platform === 'win32') app.setAppUserModelId('io.github.kyuubyn.arion');
 if (process.platform === 'linux') {
-  app.setDesktopName('arion.desktop');
+  app.setDesktopName('io.github.kyuubyn.arion.desktop');
   app.commandLine.appendSwitch('class', 'arion');
 }
 app.enableSandbox();

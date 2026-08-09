@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Arion
+GenericName=Galeria de mídia
+Comment=Galeria de mídia local, privada e extensível
+Exec=@ARION_EXEC@
+Icon=@ARION_ICON@
+Terminal=false
+Categories=AudioVideo;Video;Player;
+Keywords=mídia;vídeo;biblioteca;galeria;media;video;library;
+StartupNotify=true
+StartupWMClass=arion
+X-GNOME-UsesNotifications=false

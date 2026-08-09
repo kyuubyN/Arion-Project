@@ -9,7 +9,7 @@ ARION_BACKEND_BIN="$ARION_DIR/backend/arion-backend"
 ARION_RUNTIME_PORT="$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')"
 ARION_RUNTIME_TOKEN="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
 ARION_DESKTOP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
-ARION_DESKTOP_FILE="$ARION_DESKTOP_DIR/arion.desktop"
+ARION_DESKTOP_FILE="$ARION_DESKTOP_DIR/io.github.kyuubyn.arion.desktop"
 
 mkdir -p "$ARION_DESKTOP_DIR"
 ARION_DESKTOP_EXEC="$(printf '%s' "$ARION_DIR/arion-launcher.sh" | sed 's/[&|]/\\&/g')"
@@ -17,9 +17,10 @@ ARION_DESKTOP_ICON="$(printf '%s' "$ARION_DIR/assets/icon.png" | sed 's/[&|]/\\&
 sed \
   -e "s|@ARION_EXEC@|$ARION_DESKTOP_EXEC|g" \
   -e "s|@ARION_ICON@|$ARION_DESKTOP_ICON|g" \
-  "$ARION_DIR/arion.desktop" > "$ARION_DESKTOP_FILE.tmp"
+  "$ARION_DIR/io.github.kyuubyn.arion.desktop" > "$ARION_DESKTOP_FILE.tmp"
 chmod 0644 "$ARION_DESKTOP_FILE.tmp"
 mv "$ARION_DESKTOP_FILE.tmp" "$ARION_DESKTOP_FILE"
+rm -f "$ARION_DESKTOP_DIR/arion.desktop"
 if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "$ARION_DESKTOP_DIR" >/dev/null 2>&1 || true
 fi
