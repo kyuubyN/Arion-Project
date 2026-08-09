@@ -1,0 +1,146 @@
+{
+  "name": "arion-media-gallery",
+  "productName": "Arion",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Galeria de mídia local, privada e extensível",
+  "author": "KЯØNE / kyuubyn",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kyuubyN/Arion-Project.git"
+  },
+  "homepage": "https://github.com/kyuubyN/Arion-Project",
+  "bugs": {
+    "url": "https://github.com/kyuubyN/Arion-Project/issues"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "main": "desktop/main.cjs",
+  "build": {
+    "appId": "io.github.kyuubyn.arion",
+    "productName": "Arion",
+    "asar": true,
+    "toolsets": {
+      "wine": "1.0.1",
+      "nsis": "1.2.1"
+    },
+    "files": [
+      "desktop/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "frontend",
+        "to": "frontend"
+      },
+      {
+        "from": "docs",
+        "to": "docs",
+        "filter": [
+          "**/*.md"
+        ]
+      },
+      {
+        "from": "LICENSE",
+        "to": "licenses/LICENSE"
+      },
+      {
+        "from": "CREDITS.md",
+        "to": "licenses/CREDITS.md"
+      },
+      {
+        "from": "THIRD_PARTY_NOTICES.md",
+        "to": "licenses/THIRD_PARTY_NOTICES.md"
+      },
+      {
+        "from": "PROVIDER_POLICY.md",
+        "to": "licenses/PROVIDER_POLICY.md"
+      },
+      {
+        "from": "PRIVACY.md",
+        "to": "licenses/PRIVACY.md"
+      },
+      {
+        "from": "SBOM.spdx.json",
+        "to": "licenses/SBOM.spdx.json"
+      }
+    ],
+    "linux": {
+      "category": "AudioVideo",
+      "icon": "assets/icon.png",
+      "executableName": "arion",
+      "extraResources": [
+        {
+          "from": "build/native/linux-amd64/backend/arion-backend",
+          "to": "backend/arion-backend"
+        },
+        {
+          "from": "build/native/linux-amd64/tools/arion-provider-validator",
+          "to": "tools/arion-provider-validator"
+        }
+      ],
+      "target": [
+        "dir",
+        "tar.gz"
+      ]
+    },
+    "win": {
+      "icon": "assets/icon.png",
+      "executableName": "Arion",
+      "requestedExecutionLevel": "asInvoker",
+      "signExecutable": false,
+      "extraResources": [
+        {
+          "from": "build/native/windows-amd64/backend/arion-backend.exe",
+          "to": "backend/arion-backend.exe"
+        },
+        {
+          "from": "build/native/windows-amd64/tools/arion-provider-validator.exe",
+          "to": "tools/arion-provider-validator.exe"
+        }
+      ],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "license": "LICENSE",
+      "artifactName": "Arion-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Arion-Portable-${version}-${arch}.${ext}"
+    },
+    "artifactName": "Arion-${version}-${arch}.${ext}"
+  },
+  "scripts": {
+    "build:backend": "node scripts/go-build.mjs development-backend",
+    "build:tools": "node scripts/go-build.mjs development-tools",
+    "build:linux-native": "node scripts/go-build.mjs platform linux amd64",
+    "build:windows-native": "node scripts/go-build.mjs platform windows amd64",
+    "start": "npm run build:backend && electron .",
+    "check": "node --check desktop/main.cjs && node --check desktop/preload.cjs && node --check frontend/app.js",
+    "sbom": "npm sbom --package-lock-only --sbom-format spdx > SBOM.spdx.json",
+    "dist:linux": "npm run build:linux-native && npm run sbom && electron-builder --linux --x64",
+    "dist:windows": "npm run build:windows-native && npm run sbom && electron-builder --win --x64",
+    "dist:windows-portable": "npm run build:windows-native && npm run sbom && electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "43.3.0",
+    "electron-builder": "^26.15.3"
+  }
+}

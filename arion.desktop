@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Arion
+Comment=Galeria de mídia local e privada
+Exec=@ARION_EXEC@
+Icon=@ARION_ICON@
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;Player;
+StartupWMClass=arion

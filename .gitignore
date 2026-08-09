@@ -1,0 +1,12 @@
+/backend/arion-backend
+/backend/arion-backend.exe
+/tools/arion-provider-validator
+/tools/arion-provider-validator.exe
+/dist/
+/node_modules/
+/__pycache__/
+*.pyc
+*.log
+.DS_Store
+/release/
+/build/native/

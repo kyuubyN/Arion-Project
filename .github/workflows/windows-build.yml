@@ -1,0 +1,57 @@
+name: Windows build
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configure Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test Go
+        run: go test ./...
+
+      - name: Check frontend and Electron
+        run: npm run check
+
+      - name: Build installer and portable executable
+        run: npm run dist:windows
+
+      - name: Create checksums
+        shell: pwsh
+        run: |
+          Get-FileHash dist/Arion-Setup-*.exe, dist/Arion-Portable-*.exe -Algorithm SHA256 |
+            ForEach-Object { "{0}  {1}" -f $_.Hash.ToLower(), (Split-Path $_.Path -Leaf) } |
+            Set-Content dist/SHA256SUMS-windows.txt
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: arion-windows-x64
+          if-no-files-found: error
+          path: |
+            dist/Arion-Setup-*.exe
+            dist/Arion-Portable-*.exe
+            dist/SHA256SUMS-windows.txt

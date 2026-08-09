@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "website",
+  "id": "example.web",
+  "name": "Arion Web Provider Example",
+  "version": "1.0.0",
+  "protocol_version": 1,
+  "rpc_path": "/arion/rpc",
+  "capabilities": [
+    "catalog.search",
+    "collection.resolve",
+    "item.resolve"
+  ],
+  "author": "Arion contributors",
+  "license": "GPL-3.0-only"
+}

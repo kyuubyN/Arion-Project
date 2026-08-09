@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Arion</title>
+  <rect width="128" height="128" rx="28" fill="#fff"/>
+  <path d="M28 96 54 30h20l26 66H82l-5-14H50l-5 14H28Zm27-29h17L63.5 43 55 67Z" fill="#080808"/>
+  <path d="m58 52 18 11-18 11V52Z" fill="#fff"/>
+</svg>

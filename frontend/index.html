@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Arion — Galeria de mídia</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/logo-transparent.png" alt="Símbolo Arion">
+        <div><strong>ARION</strong><span>GALERIA DE MÍDIA</span></div>
+      </div>
+
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="nav-item active" data-view="home"><span>⌂</span> Início</button>
+        <button class="nav-item" data-view="library"><span>▦</span> Biblioteca</button>
+        <button class="nav-item" data-view="web"><span>◎</span> Web Videos</button>
+        <button class="nav-item" data-view="personal"><span>▶</span> Vídeos pessoais</button>
+        <button class="nav-item" data-view="providers"><span>◇</span> Provedores</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="nav-item" data-view="settings"><span>⚙</span> Configurações</button>
+        <div class="privacy-card">
+          <span class="privacy-dot"></span>
+          <div><strong>Local e privado</strong><small>Telemetria desativada</small></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-panel">
+      <header class="topbar">
+        <div>
+          <small class="eyebrow">ARION</small>
+          <h1 id="page-title">Início</h1>
+        </div>
+        <div class="global-search-shell">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="global-search" type="search" placeholder="Buscar na biblioteca e provedores" autocomplete="off">
+            <kbd>Ctrl K</kbd>
+          </label>
+          <div id="global-search-results" class="search-popover hidden" role="listbox"></div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section id="view-home" class="view active">
+          <div class="hero">
+            <div class="hero-copy">
+              <span class="hero-label">SUA MÍDIA. SEU ESPAÇO.</span>
+              <h2>Uma galeria feita para o que é seu.</h2>
+              <p>Organize vídeos pessoais e fontes escolhidas por você sem enviar sua biblioteca para a nuvem.</p>
+              <div class="button-row">
+                <button class="button primary" data-go="personal">Adicionar pasta</button>
+                <button class="button secondary" data-go="providers">Adicionar provedor</button>
+              </div>
+            </div>
+            <div class="hero-mark" aria-hidden="true">A</div>
+          </div>
+
+          <div id="home-stats" class="stats"></div>
+          <div class="section-heading"><div><small>RECENTES</small><h2>Suas coleções</h2></div><button class="text-button" data-go="library">Ver biblioteca</button></div>
+          <div id="home-collections" class="collection-grid"></div>
+        </section>
+
+        <section id="view-library" class="view">
+          <div class="page-intro"><small>BIBLIOTECA</small><h2>Todas as coleções</h2><p>Pastas locais, coleções web e provedores aparecem no mesmo lugar.</p></div>
+          <div id="library-empty" class="empty hidden"><strong>Sua galeria está vazia</strong><span>Adicione uma pasta de vídeos para começar.</span><button class="button primary" data-go="personal">Escolher pasta</button></div>
+          <div id="library-grid" class="collection-grid"></div>
+        </section>
+
+        <section id="view-web" class="view">
+          <div class="page-intro"><small>WEB VIDEOS</small><h2>Escolha onde assistir</h2><p>Sites remotos serão executados em sessões Chromium separadas da sua biblioteca.</p></div>
+          <div class="web-toolbar">
+            <div class="web-platforms">
+              <button class="button primary" data-web-platform="youtube">▶ YouTube</button>
+              <button class="button secondary" data-web-platform="tiktok">♪ TikTok</button>
+            </div>
+            <div class="web-navigation">
+              <button class="icon-button" data-web-command="back" title="Voltar">←</button>
+              <button class="icon-button" data-web-command="forward" title="Avançar">→</button>
+              <button class="icon-button" data-web-command="reload" title="Atualizar">↻</button>
+              <button class="icon-button" data-web-command="home" title="Início">⌂</button>
+            </div>
+            <span id="web-state-label" class="web-state-label">Chromium isolado</span>
+            <button id="clear-web-data" class="text-button">Limpar dados da sessão</button>
+          </div>
+          <div id="web-surface" class="web-surface"><div><strong>Selecione uma plataforma</strong><span>O site será aberto neste espaço sem acesso ao sistema de arquivos ou ao backend.</span></div></div>
+          <div class="notice compact"><strong>Privacidade transparente</strong><p>O Arion isola os sites da biblioteca local. As próprias plataformas ainda podem registrar sua atividade enquanto você as utiliza.</p></div>
+        </section>
+
+        <section id="view-personal" class="view">
+          <div class="page-intro"><small>BIBLIOTECA LOCAL</small><h2>Vídeos pessoais</h2><p>Você escolhe as pastas. Nada é copiado, movido ou enviado.</p></div>
+          <div class="panel">
+            <div class="panel-heading"><div><h3>Adicionar pasta de mídia</h3><p>Pastas de primeiro nível serão organizadas como coleções.</p></div><span class="badge">Somente leitura</span></div>
+            <div class="path-row"><input id="media-root-input" type="text" placeholder="/home/usuario/Vídeos"><button id="scan-media" class="button primary">Indexar pasta</button></div>
+            <div id="suggested-roots" class="chips"></div>
+            <div id="index-progress" class="progress-panel hidden"><div><strong id="index-status-title">Indexando...</strong><span id="index-status-copy"></span></div><div class="progress-track"><span></span></div></div>
+          </div>
+          <div class="section-heading"><div><small>INDEXADAS</small><h2>Pastas autorizadas</h2></div></div>
+          <div id="personal-collections" class="collection-grid"></div>
+        </section>
+
+        <section id="view-providers" class="view">
+          <div class="page-intro"><small>EXTENSÍVEL E NEUTRO</small><h2>Provedores de mídia</h2><p>O Arion não oferece nem recomenda fontes. Ele reconhece apenas manifestos compatíveis escolhidos por você.</p></div>
+          <div class="panel">
+            <div class="panel-heading"><div><h3>Encontrar provedor em uma pasta</h3><p>Procuraremos por <code>arion-provider.json</code> com profundidade limitada.</p></div><span class="badge">Protocolo 1</span></div>
+            <div class="path-row"><input id="provider-root-input" type="text" placeholder="/caminho/do/provedor"><button id="discover-providers" class="button primary">Verificar pasta</button></div>
+          </div>
+          <div id="provider-candidates" class="provider-list"></div>
+          <div class="panel provider-web-panel">
+            <div class="panel-heading"><div><h3>Adicionar site compatível</h3><p>Informe o endereço principal. O Arion verificará somente o manifesto público padronizado do site — nenhuma página será raspada.</p></div><span class="badge">HTTPS • mesma origem</span></div>
+            <div class="path-row"><input id="website-provider-url" type="url" inputmode="url" placeholder="https://exemplo.com" autocomplete="off" spellcheck="false"><button id="probe-website-provider" class="button primary">Verificar compatibilidade</button></div>
+            <p class="provider-privacy-note">A ativação não compartilha arquivos, cookies ou logins. As pesquisas enviadas depois da ativação serão visíveis ao provedor escolhido.</p>
+          </div>
+          <div id="website-provider-candidate" class="provider-list"></div>
+          <div class="section-heading"><div><small>CONFIGURADOS</small><h2>Seus provedores</h2></div></div>
+          <div id="installed-providers" class="provider-list"></div>
+        </section>
+
+        <section id="view-settings" class="view">
+          <div class="page-intro"><small>CONTROLE</small><h2>Configurações e privacidade</h2><p>Escolhas explícitas, sem configurações escondidas.</p></div>
+          <div class="panel settings-list">
+            <label class="setting"><span><strong>Sessões Web Videos</strong><small>Privada apaga dados ao fechar; persistente mantém logins.</small></span><select id="web-session-mode"><option value="private">Privada</option><option value="persistent">Persistente</option></select></label>
+            <label class="setting"><span><strong>Manter histórico web</strong><small>Salva apenas endereços visitados dentro do Arion.</small></span><input id="keep-web-history" type="checkbox"></label>
+            <label class="setting"><span><strong>Telemetria</strong><small>O Arion não possui transporte de telemetria.</small></span><input type="checkbox" disabled></label>
+            <label class="setting"><span><strong>Player padrão</strong><small>Player usado para vídeos locais.</small></span><select id="default-player"><option value="integrated">Integrado</option><option value="mpv">MPV</option><option value="celluloid">Celluloid (Linux)</option></select></label>
+            <div class="setting-action"><button id="save-settings" class="button primary">Salvar configurações</button></div>
+          </div>
+          <div class="notice"><strong>Dados armazenados neste computador</strong><p>O Arion usa as pastas de configuração e cache do seu perfil. No Linux: <code>~/.config/arion</code> e <code>~/.cache/arion</code>. No Windows: <code>%APPDATA%\arion</code> e <code>%LOCALAPPDATA%\arion</code>.</p></div>
+        </section>
+
+        <section id="view-detail" class="view">
+          <button id="detail-back" class="text-button">← Voltar</button>
+          <div id="detail-header" class="detail-header"></div>
+          <div class="list-header"><span>TÍTULO</span><span>DURAÇÃO</span><span></span></div>
+          <div id="media-list" class="media-list"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="player-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="player-dialog">
+      <div class="player-head"><div><small>REPRODUZINDO</small><strong id="player-title"></strong></div><button id="close-player" class="icon-button" aria-label="Fechar">×</button></div>
+      <video id="local-player" controls autoplay></video>
+      <div class="player-actions"><button id="open-external-player" class="button secondary">Abrir no player externo</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
