@@ -81,12 +81,14 @@
     }
   }
 
+  const PLAY_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block; vertical-align:middle;"><path d="M8 5v14l11-7z"/></svg>`;
+
   function collectionCard(collection) {
     const first = collection.items?.[0];
     const artwork = artworkURL(collection.artwork_url) || (first?.source_id === 'local' ? mediaURL('/api/media/thumbnail', first.id) : '');
     const art = artwork ? `<img src="${escapeHTML(artwork)}" alt="" loading="lazy">` : '';
     return `<button class="collection-card" data-collection="${escapeHTML(collection.id)}">
-      <span class="collection-art">${art}<span class="art-fallback">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="play-bubble">▶</span></span>
+      <span class="collection-art">${art}<span class="art-fallback">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="play-bubble">${PLAY_SVG}</span></span>
       <strong>${escapeHTML(collection.title)}</strong>
       <small>${collection.items?.length || 0} vídeo(s) • ${collection.source_id === 'local' ? 'Neste computador' : escapeHTML(collection.source_id)}</small>
     </button>`;
@@ -155,10 +157,10 @@
       popover.classList.add('hidden');
       return;
     }
-    const localHTML = localMatches.slice(0, 5).map(collection => `<button class="search-result-row" data-search-collection="${escapeHTML(collection.id)}"><span class="search-result-art">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(collection.title)}</strong><small>${collection.items?.length || 0} item(ns) • Na sua biblioteca</small></span><span>›</span></button>`).join('');
+    const localHTML = localMatches.slice(0, 5).map(collection => `<button class="search-result-row" data-search-collection="${escapeHTML(collection.id)}"><span class="search-result-art">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(collection.title)}</strong><small>${collection.items?.length || 0} item(ns) • Na sua biblioteca</small></span><span>></span></button>`).join('');
     const providerHTML = state.providerMatches.map((item, itemIndex) => {
       const artwork = artworkURL(item.artwork_url);
-      const variants = item.variants.map((variant, variantIndex) => `<button class="search-variant" data-provider-match="${itemIndex}" data-provider-variant="${variantIndex}">＋ ${escapeHTML(variantLabel(variant))}</button>`).join('');
+      const variants = item.variants.map((variant, variantIndex) => `<button class="search-variant" data-provider-match="${itemIndex}" data-provider-variant="${variantIndex}">+ ${escapeHTML(variantLabel(variant))}</button>`).join('');
       return `<article class="search-provider-result"><div class="search-provider-main"><span class="search-result-art">${artwork ? `<img src="${escapeHTML(artwork)}" alt="" loading="lazy">` : escapeHTML(item.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(item.title)}</strong><small>${item.variants.length} fonte(s) encontrada(s)</small></span></div><div class="search-variants">${variants}</div></article>`;
     }).join('');
     const hasResults = localMatches.length > 0 || state.providerMatches.length > 0;
@@ -231,19 +233,94 @@
     renderCollections();
   }
 
+  function openItemMenu(item) {
+    if (!item) return;
+    state.activeItem = item;
+    $('#item-action-title').textContent = item.title;
+    $('#item-action-modal').classList.remove('hidden');
+  }
+
+  function closeItemMenu() {
+    $('#item-action-modal').classList.add('hidden');
+  }
+
   function openCollection(id) {
     const collection = state.collections.find(item => item.id === id);
     if (!collection) return;
     state.activeCollection = collection;
     const detailArtwork = artworkURL(collection.artwork_url) || (collection.items?.[0]?.source_id === 'local' ? mediaURL('/api/media/thumbnail', collection.items[0].id) : '');
-    $('#detail-header').innerHTML = `<div class="detail-art">${detailArtwork ? `<img src="${escapeHTML(detailArtwork)}" alt="">` : ''}<span>${escapeHTML(collection.title.slice(0, 1))}</span></div><div><small>${collection.kind === 'local_folder' ? 'COLEÇÃO LOCAL' : 'COLEÇÃO DE PROVEDOR'}</small><h2>${escapeHTML(collection.title)}</h2><p>${collection.items.length} item(ns) • ${escapeHTML(collection.root_path || collection.source_id)}</p></div>`;
+    const descriptionHTML = collection.description ? `<p style="margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; max-width:750px;">${escapeHTML(collection.description)}</p>` : '';
+    $('#detail-header').innerHTML = `<div class="detail-art">${detailArtwork ? `<img src="${escapeHTML(detailArtwork)}" alt="">` : ''}<span>${escapeHTML(collection.title.slice(0, 1))}</span></div><div><small>${collection.kind === 'local_folder' ? 'COLEÇÃO LOCAL' : 'COLEÇÃO DE PROVEDOR'}</small><h2>${escapeHTML(collection.title)}</h2><p style="font-weight:600;">${collection.items.length} item(ns) • ${escapeHTML(collection.root_path || collection.source_id)}</p>${descriptionHTML}</div>`;
     $('#media-list').innerHTML = collection.items.map((item, index) => `<div class="media-row">
-      <button class="media-main" data-play="${escapeHTML(item.id)}"><span class="media-index">${index + 1}</span><span class="media-thumb">${item.source_id === 'local' ? `<img src="${mediaURL('/api/media/thumbnail', item.id)}" alt="">` : ''}<i>▶</i></span><span><strong>${escapeHTML(item.title)}</strong><small>${item.source_id === 'local' ? (item.width ? `${item.width}×${item.height}` : 'Vídeo local') : 'Mídia do provedor'}${item.watched ? ' • Assistido' : item.playback_time ? ' • Em andamento' : ''}</small></span></button>
+      <button class="media-main" data-play="${escapeHTML(item.id)}"><span class="media-index">${index + 1}</span><span class="media-thumb">${item.source_id === 'local' ? `<img src="${mediaURL('/api/media/thumbnail', item.id)}" alt="">` : ''}<i>${PLAY_SVG}</i></span><span><strong>${escapeHTML(item.title)}</strong><small>${item.source_id === 'local' ? (item.width ? `${item.width}×${item.height}` : 'Vídeo local') : 'Mídia do provedor'}${item.watched ? ' • Assistido' : item.playback_time ? ' • Em andamento' : ''}</small></span></button>
       <span>${formatDuration(item.duration_seconds)}</span><button class="icon-button" data-more="${escapeHTML(item.id)}">•••</button>
     </div>`).join('') || emptyInline('Esta coleção não possui vídeos');
     $$('#media-list [data-play]').forEach(button => button.addEventListener('click', () => playItem(button.dataset.play)));
+    $$('#media-list [data-more]').forEach(button => button.addEventListener('click', () => {
+      const item = collection.items.find(candidate => candidate.id === button.dataset.more);
+      openItemMenu(item);
+    }));
     bindImageFallbacks($('#view-detail'));
     navigate('detail');
+  }
+
+  function showDownloadProgress(text, percent = 0) {
+    const badge = $('#download-progress-badge');
+    const label = $('#download-progress-text');
+    const pctLabel = $('#download-progress-percent');
+    const fill = $('#download-progress-fill');
+
+    const floatCard = $('#download-floating-card');
+    const floatTitle = $('#download-floating-title');
+    const floatPct = $('#download-floating-percent');
+    const floatFill = $('#download-floating-fill');
+
+    const clampPct = Math.min(100, Math.max(0, Math.round(percent)));
+
+    if (badge && label && fill) {
+      label.textContent = text || 'Baixando arquivo...';
+      if (pctLabel) pctLabel.textContent = `${clampPct}%`;
+      fill.style.width = `${clampPct}%`;
+      badge.classList.remove('hidden');
+    }
+    if (floatCard && floatTitle && floatFill) {
+      floatTitle.textContent = text || 'Baixando arquivo...';
+      if (floatPct) floatPct.textContent = `${clampPct}%`;
+      floatFill.style.width = `${clampPct}%`;
+      floatCard.classList.remove('hidden');
+    }
+  }
+
+  function hideDownloadProgress() {
+    const badge = $('#download-progress-badge');
+    if (badge) badge.classList.add('hidden');
+    const floatCard = $('#download-floating-card');
+    if (floatCard) floatCard.classList.add('hidden');
+  }
+
+  async function trackDownloadTask(taskID, itemTitle) {
+    showDownloadProgress(`Baixando ${itemTitle}...`, 0);
+    const interval = setInterval(async () => {
+      try {
+        const task = await api(`/api/media/download/status?id=${encodeURIComponent(taskID)}`);
+        if (task.status === 'downloading') {
+          showDownloadProgress(`Baixando ${itemTitle}...`, task.progress_percent || 0);
+        } else if (task.status === 'completed') {
+          clearInterval(interval);
+          showDownloadProgress(`Download concluído`, 100);
+          setTimeout(() => hideDownloadProgress(), 1500);
+          showToast(`Download de "${itemTitle}" concluído e salvo na biblioteca local.`);
+          await loadCollections();
+        } else if (task.status === 'failed') {
+          clearInterval(interval);
+          hideDownloadProgress();
+          showToast(task.error || 'Erro ao realizar download do vídeo.', true);
+        }
+      } catch (err) {
+        clearInterval(interval);
+        hideDownloadProgress();
+      }
+    }, 500);
   }
 
   async function playItem(id) {
@@ -251,19 +328,36 @@
     if (!item) return;
     state.activeItem = item;
     if (item.source_id !== 'local') {
+      showDownloadProgress(`Carregando vídeo: ${item.title}…`);
       try {
-        const result = await api('/api/providers/play', { method: 'POST', body: JSON.stringify({ item_id: item.id, player: state.settings?.default_player }) });
-        showToast(`Reprodução iniciada no ${result.player}.`);
-      } catch (error) { showToast(error.message, true); }
+        const result = await api('/api/providers/play', { method: 'POST', body: JSON.stringify({ item_id: item.id, player: state.settings?.default_player || 'integrated' }) });
+        hideDownloadProgress();
+        if (result.player === 'integrated' && result.url) {
+          $('#player-title').textContent = item.title;
+          const player = $('#local-player');
+          const streamUrl = result.url.startsWith('http') ? result.url : (location.origin + result.url);
+          player.src = streamUrl;
+          $('#player-modal').classList.remove('hidden');
+          player.play().catch(() => {});
+          showToast(`Reproduzindo ${item.title}`);
+        } else {
+          showToast(`Reprodução iniciada no ${result.player || 'player externo'}.`);
+        }
+      } catch (error) {
+        hideDownloadProgress();
+        showToast(error.message, true);
+      }
       return;
     }
     $('#player-title').textContent = item.title;
     const player = $('#local-player');
-    player.src = mediaURL('/api/media/local', item.id);
+    const mediaUrl = mediaURL('/api/media/local', item.id);
+    player.src = mediaUrl.startsWith('http') ? mediaUrl : (location.origin + mediaUrl);
     player.onloadedmetadata = () => {
       if (item.playback_time > 0 && item.playback_time < player.duration - 20) player.currentTime = item.playback_time;
     };
     $('#player-modal').classList.remove('hidden');
+    player.play().catch(() => {});
   }
 
   async function saveProgress() {
@@ -446,6 +540,43 @@
     });
     $('#close-player').addEventListener('click', closePlayer);
     $('#player-modal').addEventListener('click', event => { if (event.target === $('#player-modal')) closePlayer(); });
+    $('#close-item-action').addEventListener('click', closeItemMenu);
+    $('#item-action-modal').addEventListener('click', event => { if (event.target === $('#item-action-modal')) closeItemMenu(); });
+    $('#action-btn-play').addEventListener('click', () => {
+      closeItemMenu();
+      if (state.activeItem) playItem(state.activeItem.id);
+    });
+    $('#action-btn-download').addEventListener('click', async () => {
+      closeItemMenu();
+      if (!state.activeItem) return;
+      const item = state.activeItem;
+      showToast(`Iniciando download de "${item.title}"...`);
+      try {
+        const task = await api('/api/media/download', {
+          method: 'POST',
+          body: JSON.stringify({
+            item_id: item.id,
+            provider_id: item.source_id,
+            reference: item.provider_reference,
+            title: item.title,
+            collection_id: state.activeCollection?.id,
+            collection_title: state.activeCollection?.title,
+            artwork_url: state.activeCollection?.artwork_url
+          })
+        });
+        if (task && task.id) {
+          trackDownloadTask(task.id, item.title);
+        }
+      } catch (error) {
+        hideDownloadProgress();
+        showToast(error.message, true);
+      }
+    });
+    $('#action-btn-copy').addEventListener('click', () => {
+      closeItemMenu();
+      if (!state.activeItem) return;
+      navigator.clipboard.writeText(state.activeItem.title).then(() => showToast('Título copiado para a área de transferência.')).catch(() => {});
+    });
     $('#open-external-player').addEventListener('click', async () => {
       if (!state.activeItem) return;
       const preferred = state.settings?.default_player;

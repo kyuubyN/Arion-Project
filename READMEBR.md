@@ -19,6 +19,7 @@ O núcleo **não** embute catálogo de fontes, **não** recomenda serviços de t
 
 ## Sumário
 
+- [Interface](#interface)
 - [Estado atual](#estado-atual)
 - [Arquitetura em resumo](#arquitetura-em-resumo)
 - [Requisitos](#requisitos)
@@ -28,6 +29,22 @@ O núcleo **não** embute catálogo de fontes, **não** recomenda serviços de t
 - [Provedores](#provedores)
 - [Documentação](#documentação)
 - [Licença](#licença)
+
+## Interface
+
+<div align="center">
+
+### Início & Galeria de Mídia
+<img src="./assets/arion-home-preview.png" alt="Arion - Tela Inicial" width="800">
+
+<br><br>
+
+### Web Videos (Sessões Isoladas) & Configurações
+<img src="./assets/arion-webvideos-preview.png" alt="Arion - Web Videos" width="800">
+<br><br>
+<img src="./assets/arion-settings-preview.png" alt="Arion - Configurações e Privacidade" width="800">
+
+</div>
 
 ## Estado atual
 

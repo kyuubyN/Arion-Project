@@ -38,6 +38,15 @@
           <small class="eyebrow">ARION</small>
           <h1 id="page-title">Início</h1>
         </div>
+        <div id="download-progress-badge" class="download-progress-container hidden">
+          <div class="download-info">
+            <span id="download-progress-text">Baixando arquivo...</span>
+            <span id="download-progress-percent">0%</span>
+          </div>
+          <div class="progress-bar-shell">
+            <div id="download-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
         <div class="global-search-shell">
           <label class="search-box">
             <span>⌕</span>
@@ -112,20 +121,52 @@
             <div class="panel-heading"><div><h3>Encontrar provedor em uma pasta</h3><p>Procuraremos por <code>arion-provider.json</code> com profundidade limitada.</p></div><span class="badge">Protocolo 1</span></div>
             <div class="path-row"><input id="provider-root-input" type="text" placeholder="/caminho/do/provedor"><button id="discover-providers" class="button primary">Verificar pasta</button></div>
           </div>
-          <div id="provider-candidates" class="provider-list"></div>
-          <div class="panel provider-web-panel">
-            <div class="panel-heading"><div><h3>Adicionar site compatível</h3><p>Informe o endereço principal. O Arion verificará somente o manifesto público padronizado do site — nenhuma página será raspada.</p></div><span class="badge">HTTPS • mesma origem</span></div>
-            <div class="path-row"><input id="website-provider-url" type="url" inputmode="url" placeholder="https://exemplo.com" autocomplete="off" spellcheck="false"><button id="probe-website-provider" class="button primary">Verificar compatibilidade</button></div>
-            <p class="provider-privacy-note">A ativação não compartilha arquivos, cookies ou logins. As pesquisas enviadas depois da ativação serão visíveis ao provedor escolhido.</p>
+          <div class="page-intro">
+            <small>PROVEDORES</small>
+            <h2>Adicionar fontes e catálogos</h2>
+            <p>O Arion usa manifestos neutros e conectores isolados. Nenhuma fonte padrão vem embutida.</p>
           </div>
-          <div id="website-provider-candidate" class="provider-list"></div>
-          <div class="section-heading"><div><small>CONFIGURADOS</small><h2>Seus provedores</h2></div></div>
+
+          <div class="provider-section-grid">
+            <div class="index-panel">
+              <small class="eyebrow">OPÇÃO A — PROVEDORES LOCAIS</small>
+              <h3>Provedores no seu computador</h3>
+              <p style="color:var(--muted); font-size:12px;">Descubra executáveis locais contendo o manifesto <code>arion-provider.json</code>.</p>
+              <label class="input-label">
+                <span>Pasta dos provedores</span>
+                <input id="provider-root-input" type="text" placeholder="/home/usuario/.arion/providers ou C:\arion\providers">
+              </label>
+              <button id="discover-providers" class="button secondary">Buscar provedores locais</button>
+              <div id="provider-candidates" class="provider-candidates"></div>
+            </div>
+
+            <div class="index-panel">
+              <small class="eyebrow">OPÇÃO B — PROVEDORES WEB</small>
+              <h3>Conectar site por endereço HTTPS</h3>
+              <p style="color:var(--muted); font-size:12px;">Conecte sites que publiquem um manifesto neutro em <code>/.well-known/arion-provider.json</code>.</p>
+              <label class="input-label">
+                <span>Endereço do site</span>
+                <input id="website-provider-url" type="text" placeholder="https://exemplo.com">
+              </label>
+              <button id="probe-website-provider" class="button secondary">Verificar manifesto do site</button>
+              <div id="website-provider-candidate" class="provider-candidates"></div>
+            </div>
+          </div>
+
+          <div class="page-intro" style="margin-top: 35px;">
+            <small>GERENCIAR PROVEDORES</small>
+            <h3>Provedores instalados</h3>
+          </div>
           <div id="installed-providers" class="provider-list"></div>
         </section>
 
         <section id="view-settings" class="view">
-          <div class="page-intro"><small>CONTROLE</small><h2>Configurações e privacidade</h2><p>Escolhas explícitas, sem configurações escondidas.</p></div>
-          <div class="panel settings-list">
+          <div class="page-intro">
+            <small>CONTROLE</small>
+            <h2>Configurações e privacidade</h2>
+            <p>Escolhas explícitas, sem configurações escondidas.</p>
+          </div>
+          <div class="settings-list">
             <label class="setting"><span><strong>Sessões Web Videos</strong><small>Privada apaga dados ao fechar; persistente mantém logins.</small></span><select id="web-session-mode"><option value="private">Privada</option><option value="persistent">Persistente</option></select></label>
             <label class="setting"><span><strong>Manter histórico web</strong><small>Salva apenas endereços visitados dentro do Arion.</small></span><input id="keep-web-history" type="checkbox"></label>
             <label class="setting"><span><strong>Telemetria</strong><small>O Arion não possui transporte de telemetria.</small></span><input type="checkbox" disabled></label>
@@ -136,7 +177,7 @@
         </section>
 
         <section id="view-detail" class="view">
-          <button id="detail-back" class="text-button">← Voltar</button>
+          <button id="detail-back" class="text-button">Voltar</button>
           <div id="detail-header" class="detail-header"></div>
           <div class="list-header"><span>TÍTULO</span><span>DURAÇÃO</span><span></span></div>
           <div id="media-list" class="media-list"></div>
@@ -147,13 +188,37 @@
 
   <div id="player-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="player-dialog">
-      <div class="player-head"><div><small>REPRODUZINDO</small><strong id="player-title"></strong></div><button id="close-player" class="icon-button" aria-label="Fechar">×</button></div>
+      <div class="player-head"><div><small>REPRODUZINDO</small><strong id="player-title"></strong></div><button id="close-player" class="icon-button" aria-label="Fechar">x</button></div>
       <video id="local-player" controls autoplay></video>
       <div class="player-actions"><button id="open-external-player" class="button secondary">Abrir no player externo</button></div>
     </div>
   </div>
 
+  <div id="item-action-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="item-action-dialog">
+      <div class="item-action-head">
+        <div><small>OPÇÕES DE MÍDIA</small><strong id="item-action-title">Episódio</strong></div>
+        <button id="close-item-action" class="icon-button">x</button>
+      </div>
+      <div class="item-action-options">
+        <button id="action-btn-play" class="button primary">Reproduzir Episódio</button>
+        <button id="action-btn-download" class="button secondary">Baixar arquivo para o computador</button>
+        <button id="action-btn-copy" class="button secondary">Copiar Título</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden" role="status"></div>
+
+  <div id="download-floating-card" class="download-floating-card hidden">
+    <div class="download-floating-head">
+      <strong id="download-floating-title">Baixando arquivo...</strong>
+      <span id="download-floating-percent">0%</span>
+    </div>
+    <div class="progress-bar-shell">
+      <div id="download-floating-fill" class="progress-bar-fill" style="width: 0%;"></div>
+    </div>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

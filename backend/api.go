@@ -7,6 +7,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"mime"
@@ -35,12 +36,14 @@ type API struct {
 	processes    *player.ProcessManager
 	audit        *security.AuditLogger
 	artwork      *ArtworkCache
+	downloader   *DownloadManager
 	sessionToken string
 	shutdown     chan struct{}
 }
 
 func NewAPI(gallery *GalleryStore, settings *SettingsStore, indexer *MediaIndexer, players *player.PlayerService, processes *player.ProcessManager, audit *security.AuditLogger, artwork *ArtworkCache, token string, shutdown chan struct{}) *API {
-	return &API{gallery: gallery, settings: settings, indexer: indexer, players: players, processes: processes, audit: audit, artwork: artwork, sessionToken: token, shutdown: shutdown}
+	dm := NewDownloadManager(gallery)
+	return &API{gallery: gallery, settings: settings, indexer: indexer, players: players, processes: processes, audit: audit, artwork: artwork, downloader: dm, sessionToken: token, shutdown: shutdown}
 }
 
 func (a *API) Routes(frontendDir string) http.Handler {
@@ -52,6 +55,9 @@ func (a *API) Routes(frontendDir string) http.Handler {
 	mux.HandleFunc("/api/index/scan", a.handleIndexScan)
 	mux.HandleFunc("/api/index/status", a.handleIndexStatus)
 	mux.HandleFunc("/api/media/local", a.handleLocalMedia)
+	mux.HandleFunc("/api/media/stream", a.handleMediaStreamProxy)
+	mux.HandleFunc("/api/media/download", a.handleStartDownloadTask)
+	mux.HandleFunc("/api/media/download/status", a.handleDownloadTaskStatus)
 	mux.HandleFunc("/api/media/thumbnail", a.handleThumbnail)
 	mux.HandleFunc("/api/media/artwork", a.handleArtwork)
 	mux.HandleFunc("/api/history/update", a.handleUpdateProgress)
@@ -93,7 +99,7 @@ func (a *API) securityMiddleware(next http.Handler) http.Handler {
 		}
 		if strings.HasPrefix(r.URL.Path, "/api/") && r.URL.Path != "/api/health" {
 			provided := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-			if provided == "" && (r.URL.Path == "/api/media/local" || r.URL.Path == "/api/media/thumbnail" || r.URL.Path == "/api/media/artwork") {
+			if provided == "" && (r.URL.Path == "/api/media/local" || r.URL.Path == "/api/media/stream" || r.URL.Path == "/api/media/thumbnail" || r.URL.Path == "/api/media/artwork") {
 				provided = r.URL.Query().Get("session")
 			}
 			if len(provided) != len(a.sessionToken) || subtle.ConstantTimeCompare([]byte(provided), []byte(a.sessionToken)) != 1 {
@@ -119,7 +125,26 @@ func (a *API) handleCollections(w http.ResponseWriter, r *http.Request) {
 		methodNotAllowed(w, http.MethodGet)
 		return
 	}
-	jsonResponse(w, http.StatusOK, map[string]any{"collections": a.gallery.Collections()})
+	collections := a.gallery.Collections()
+	jsonResponse(w, http.StatusOK, map[string]any{"collections": collections})
+
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		for _, col := range collections {
+			if (col.ArtworkURL == "" || col.Description == "") && col.Title != "" {
+				if aniMeta, err := FetchAniListMetadata(ctx, col.Title); err == nil && aniMeta != nil {
+					if col.ArtworkURL == "" && aniMeta.ArtworkURL != "" {
+						col.ArtworkURL = aniMeta.ArtworkURL
+					}
+					if col.Description == "" && aniMeta.Description != "" {
+						col.Description = aniMeta.Description
+					}
+					_ = a.gallery.UpsertProviderCollection(col)
+				}
+			}
+		}
+	}()
 }
 
 func (a *API) handleRemoveCollection(w http.ResponseWriter, r *http.Request) {
@@ -556,6 +581,18 @@ func (a *API) handleProviderImport(w http.ResponseWriter, r *http.Request) {
 		ProviderReference: request.Reference, Items: make([]MediaItem, 0, len(resolved.Items)),
 		AddedAt: now, UpdatedAt: now,
 	}
+
+	if collection.ArtworkURL == "" || collection.Description == "" {
+		if aniMeta, err := FetchAniListMetadata(r.Context(), collection.Title); err == nil && aniMeta != nil {
+			if collection.ArtworkURL == "" {
+				collection.ArtworkURL = aniMeta.ArtworkURL
+			}
+			if collection.Description == "" {
+				collection.Description = aniMeta.Description
+			}
+		}
+	}
+
 	for _, sourceItem := range resolved.Items {
 		collection.Items = append(collection.Items, MediaItem{
 			ID:           stableID("provider-item:"+provider.ID, resolved.ID+"\x00"+sourceItem.ID),
@@ -648,18 +685,38 @@ func (a *API) handleProviderPlay(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	playerName := request.Player
-	if playerName == "" || playerName == "integrated" {
-		playerName = firstInstalledExternalPlayer(a.players)
+	// The media URL stays server-side.  Passing an arbitrary URL back into a
+	// local proxy would turn this endpoint into an SSRF primitive and expose
+	// short-lived provider URLs in the renderer.
+	streamProxyURL := "/api/media/stream?id=" + url.QueryEscape(item.ID) + "&session=" + url.QueryEscape(a.sessionToken)
+	if playerName == "integrated" {
+		jsonResponse(w, http.StatusOK, map[string]any{
+			"status":  "resolved",
+			"player":  "integrated",
+			"url":     streamProxyURL,
+			"title":   item.Title,
+			"item_id": item.ID,
+		})
+		return
 	}
 	if playerName == "" {
-		jsonError(w, http.StatusConflict, errors.New("install MPV or Celluloid to play provider streams securely"))
-		return
+		playerName = firstInstalledExternalPlayer(a.players)
+		if playerName == "" {
+			jsonResponse(w, http.StatusOK, map[string]any{
+				"status":  "resolved",
+				"player":  "integrated",
+				"url":     streamProxyURL,
+				"title":   item.Title,
+				"item_id": item.ID,
+			})
+			return
+		}
 	}
 	if err := a.players.Play(context.Background(), playerName, resolved.URL, resolved.Headers, item.Title); err != nil {
 		jsonError(w, http.StatusBadRequest, err)
 		return
 	}
-	jsonResponse(w, http.StatusOK, map[string]string{"status": "playing", "player": playerName})
+	jsonResponse(w, http.StatusOK, map[string]any{"status": "playing", "player": playerName, "url": resolved.URL})
 }
 
 func firstInstalledExternalPlayer(players *player.PlayerService) string {
@@ -831,4 +888,210 @@ func allowedConfiguredPath(path string, settings AppSettings) bool {
 		}
 	}
 	return false
+}
+
+func isHopByHopHeader(header string) bool {
+	h := http.CanonicalHeaderKey(header)
+	return h == "Connection" ||
+		h == "Keep-Alive" ||
+		h == "Proxy-Authenticate" ||
+		h == "Proxy-Authorization" ||
+		h == "Te" ||
+		h == "Trailers" ||
+		h == "Transfer-Encoding" ||
+		h == "Upgrade"
+}
+
+func (a *API) handleMediaStreamProxy(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		methodNotAllowed(w, http.MethodGet)
+		return
+	}
+	itemID := r.URL.Query().Get("id")
+	if itemID == "" {
+		http.Error(w, `{"error":"missing id"}`, http.StatusBadRequest)
+		return
+	}
+	item, err := a.gallery.MediaItem(itemID)
+	if err != nil || item.SourceID == "local" || item.ProviderReference == "" {
+		http.NotFound(w, r)
+		return
+	}
+	provider, err := configuredProvider(a.settings.Get(), item.SourceID)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	var resolved ProviderItemResolveResult
+	if err := CallProvider(r.Context(), provider, "item.resolve", ProviderItemResolveParams{Reference: item.ProviderReference}, &resolved); err != nil {
+		http.Error(w, `{"error":"provider stream resolution failed"}`, http.StatusBadGateway)
+		return
+	}
+	if resolved.URL == "" {
+		http.Error(w, `{"error":"empty stream url"}`, http.StatusBadGateway)
+		return
+	}
+	guard := security.NewSSRFGuard(a.audit)
+	if _, err := guard.ValidateURL(resolved.URL); err != nil {
+		http.Error(w, `{"error":"provider returned an unsafe media URL"}`, http.StatusBadGateway)
+		return
+	}
+	for name, value := range resolved.Headers {
+		if !validMediaHeader(name, value) {
+			http.Error(w, `{"error":"provider returned an unsafe media header"}`, http.StatusBadGateway)
+			return
+		}
+	}
+
+	reqCtx, cancel := context.WithTimeout(r.Context(), 4*time.Hour)
+	defer cancel()
+
+	proxyReq, err := http.NewRequestWithContext(reqCtx, r.Method, resolved.URL, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for k, v := range resolved.Headers {
+		proxyReq.Header.Set(k, v)
+	}
+	if proxyReq.Header.Get("User-Agent") == "" {
+		proxyReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	}
+	if proxyReq.Header.Get("Referer") == "" {
+		if parsed, err := url.Parse(resolved.URL); err == nil {
+			proxyReq.Header.Set("Referer", fmt.Sprintf("%s://%s/", parsed.Scheme, parsed.Host))
+		}
+	}
+	if rangeHeader := r.Header.Get("Range"); rangeHeader != "" {
+		proxyReq.Header.Set("Range", rangeHeader)
+	}
+
+	client := guard.NewSecureHTTPClient(4 * time.Hour)
+	if transport, ok := client.Transport.(*http.Transport); ok {
+		transport.DisableCompression = true
+	}
+	resp, err := client.Do(proxyReq)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+
+	for k, vv := range resp.Header {
+		if isHopByHopHeader(k) {
+			continue
+		}
+		for _, v := range vv {
+			w.Header().Add(k, v)
+		}
+	}
+	if w.Header().Get("Content-Type") == "" || w.Header().Get("Content-Type") == "application/octet-stream" {
+		w.Header().Set("Content-Type", "video/mp4")
+	}
+	w.WriteHeader(resp.StatusCode)
+	_, _ = io.Copy(w, resp.Body)
+}
+
+func (a *API) handleStartDownloadTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		methodNotAllowed(w, http.MethodPost)
+		return
+	}
+	var request struct {
+		ItemID          string `json:"item_id"`
+		ProviderID      string `json:"provider_id,omitempty"`
+		Reference       string `json:"reference,omitempty"`
+		Title           string `json:"title,omitempty"`
+		CollectionID    string `json:"collection_id,omitempty"`
+		CollectionTitle string `json:"collection_title,omitempty"`
+		ArtworkURL      string `json:"artwork_url,omitempty"`
+	}
+	if err := decodeJSON(r, &request); err != nil {
+		jsonError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	var item MediaItem
+	var err error
+	options := DownloadOptions{
+		CollectionTitle: request.CollectionTitle,
+		ArtworkURL:      request.ArtworkURL,
+	}
+
+	if request.ItemID != "" {
+		item, err = a.gallery.MediaItem(request.ItemID)
+		if err == nil && item.CollectionID != "" {
+			if parentCol := a.gallery.Collection(item.CollectionID); parentCol != nil {
+				if options.CollectionTitle == "" {
+					options.CollectionTitle = parentCol.Title
+				}
+				if options.ArtworkURL == "" {
+					options.ArtworkURL = parentCol.ArtworkURL
+				}
+			}
+		}
+	}
+
+	if (err != nil || item.ID == "") && request.ProviderID != "" && request.Reference != "" {
+		item = MediaItem{
+			ID:                stableID("provider-item:"+request.ProviderID, request.Reference),
+			Title:             request.Title,
+			Kind:              MediaEpisode,
+			SourceID:          request.ProviderID,
+			ProviderReference: request.Reference,
+		}
+		err = nil
+	}
+
+	if err != nil || item.SourceID == "" || item.SourceID == "local" || item.ProviderReference == "" {
+		jsonError(w, http.StatusNotFound, ErrMediaNotFound)
+		return
+	}
+	provider, err := configuredProvider(a.settings.Get(), item.SourceID)
+	if err != nil {
+		jsonError(w, http.StatusNotFound, err)
+		return
+	}
+	var resolved ProviderItemResolveResult
+	if err := CallProvider(r.Context(), provider, "item.resolve", ProviderItemResolveParams{Reference: item.ProviderReference}, &resolved); err != nil {
+		jsonError(w, http.StatusBadGateway, err)
+		return
+	}
+	guard := security.NewSSRFGuard(a.audit)
+	if _, err := guard.ValidateURL(resolved.URL); err != nil {
+		jsonError(w, http.StatusBadGateway, errors.New("provider returned an unsafe media URL"))
+		return
+	}
+	for name, value := range resolved.Headers {
+		if !validMediaHeader(name, value) {
+			jsonError(w, http.StatusBadGateway, errors.New("provider returned an unsafe media header"))
+			return
+		}
+	}
+
+	task, err := a.downloader.StartDownload(r.Context(), item, options, resolved.URL, resolved.Headers)
+	if err != nil {
+		jsonError(w, http.StatusInternalServerError, err)
+		return
+	}
+	jsonResponse(w, http.StatusAccepted, task)
+}
+
+func (a *API) handleDownloadTaskStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		methodNotAllowed(w, http.MethodGet)
+		return
+	}
+	taskID := r.URL.Query().Get("id")
+	if taskID == "" {
+		jsonResponse(w, http.StatusOK, map[string]any{"tasks": a.downloader.ActiveTasks()})
+		return
+	}
+	task, found := a.downloader.GetTask(taskID)
+	if !found {
+		jsonError(w, http.StatusNotFound, errors.New("download task not found"))
+		return
+	}
+	jsonResponse(w, http.StatusOK, task)
 }

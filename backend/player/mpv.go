@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 	"sync"
 )
 
@@ -83,8 +84,19 @@ func (m *MPVProvider) Launch(ctx context.Context, streamURL string, headers map[
 		fmt.Sprintf("--force-media-title=%s", title),
 	}
 
+	headerFields := make([]string, 0, len(headers)+1)
+	hasUserAgent := false
 	for k, v := range headers {
-		args = append(args, fmt.Sprintf("--http-header-fields=%s: %s", k, v))
+		if strings.EqualFold(k, "User-Agent") {
+			hasUserAgent = true
+		}
+		headerFields = append(headerFields, fmt.Sprintf("%s: %s", k, v))
+	}
+	if !hasUserAgent {
+		headerFields = append(headerFields, "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	}
+	if len(headerFields) > 0 {
+		args = append(args, fmt.Sprintf("--http-header-fields=%s", strings.Join(headerFields, ", ")))
 	}
 
 	// Add argument separator '--' to ensure streamURL is treated strictly as a positional operand

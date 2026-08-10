@@ -171,6 +171,53 @@ func (s *GalleryStore) MediaItem(id string) (MediaItem, error) {
 	return MediaItem{}, ErrMediaNotFound
 }
 
+func (s *GalleryStore) UpsertDownloadedItem(item MediaItem, collectionTitle, dir, artworkURL string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if collectionTitle == "" {
+		collectionTitle = "Downloads do Arion"
+	}
+
+	colID := stableID("collection", dir)
+	col, exists := s.data.Collections[colID]
+	if !exists {
+		col = &Collection{
+			ID:         colID,
+			Title:      collectionTitle,
+			Kind:       CollectionLocalFolder,
+			SourceID:   "local",
+			RootPath:   dir,
+			ArtworkURL: artworkURL,
+			AddedAt:    time.Now(),
+			UpdatedAt:  time.Now(),
+			Items:      []MediaItem{},
+		}
+		s.data.Collections[colID] = col
+	}
+
+	if col.ArtworkURL == "" && artworkURL != "" {
+		col.ArtworkURL = artworkURL
+	}
+
+	item.CollectionID = colID
+	replaced := false
+	for i, existing := range col.Items {
+		if existing.ID == item.ID || existing.Path == item.Path {
+			col.Items[i] = item
+			replaced = true
+			break
+		}
+	}
+	if !replaced {
+		col.Items = append(col.Items, item)
+	}
+
+	col.UpdatedAt = time.Now()
+	s.data.UpdatedAt = time.Now()
+	return s.saveLocked()
+}
+
 func (s *GalleryStore) saveLocked() error {
 	s.data.SchemaVersion = gallerySchemaVersion
 	return writeJSONAtomic(s.filePath, s.data)

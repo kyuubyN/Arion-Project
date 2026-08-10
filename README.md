@@ -19,6 +19,7 @@ The core **does not** bundle a source catalog, **does not** recommend third-part
 
 ## Table of contents
 
+- [Interface](#interface)
 - [Current state](#current-state)
 - [Architecture overview](#architecture-overview)
 - [Requirements](#requirements)
@@ -28,6 +29,22 @@ The core **does not** bundle a source catalog, **does not** recommend third-part
 - [Providers](#providers)
 - [Documentation](#documentation)
 - [License](#license)
+
+## Interface
+
+<div align="center">
+
+### Home & Media Library
+<img src="./assets/arion-home-preview.png" alt="Arion - Home View" width="800">
+
+<br><br>
+
+### Web Videos (Isolated Sessions) & Settings
+<img src="./assets/arion-webvideos-preview.png" alt="Arion - Web Videos" width="800">
+<br><br>
+<img src="./assets/arion-settings-preview.png" alt="Arion - Settings & Privacy" width="800">
+
+</div>
 
 ## Current state
 

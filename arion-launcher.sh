@@ -29,6 +29,18 @@ if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "$ARION_DESKTOP_DIR" >/dev/null 2>&1 || true
 fi
 
+# Also maintain user desktop shortcuts
+if [ -d "$HOME/Desktop" ]; then
+  cp "$ARION_DESKTOP_FILE" "$HOME/Desktop/Arion.desktop"
+  chmod 0755 "$HOME/Desktop/Arion.desktop"
+  gio set "$HOME/Desktop/Arion.desktop" metadata::trusted true 2>/dev/null || true
+fi
+if [ -d "$HOME/Área de Trabalho" ]; then
+  cp "$ARION_DESKTOP_FILE" "$HOME/Área de Trabalho/Arion.desktop"
+  chmod 0755 "$HOME/Área de Trabalho/Arion.desktop"
+  gio set "$HOME/Área de Trabalho/Arion.desktop" metadata::trusted true 2>/dev/null || true
+fi
+
 if [ ! -x "$ARION_GO_BIN" ]; then
   ARION_GO_BIN="$(command -v go)"
 fi
@@ -38,17 +50,19 @@ if [ ! -f "$ARION_BACKEND_BIN" ] || find "$ARION_DIR/backend" -name '*.go' -newe
   "$ARION_GO_BIN" build -o "$ARION_BACKEND_BIN" ./backend
 fi
 
+export ELECTRON_DISABLE_SANDBOX=1
+
 ARION_ELECTRON_RUNTIME="$ARION_DIR/node_modules/electron/dist/electron"
 ARION_ELECTRON_CLI="$ARION_DIR/node_modules/.bin/electron"
 if [ -x "$ARION_ELECTRON_RUNTIME" ]; then
   # Some automation environments export ELECTRON_RUN_AS_NODE. Arion always
   # needs the real Chromium runtime here. Launching the native executable also
   # avoids depending on an NVM-managed `node` that GNOME does not add to PATH.
-  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_RUNTIME" "$ARION_DIR"
+  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_RUNTIME" "$ARION_DIR" --no-sandbox "$@"
   exit $?
 fi
 if [ -x "$ARION_ELECTRON_CLI" ] && command -v node >/dev/null 2>&1; then
-  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_CLI" "$ARION_DIR"
+  env -u ELECTRON_RUN_AS_NODE "$ARION_ELECTRON_CLI" "$ARION_DIR" --no-sandbox "$@"
   exit $?
 fi
 
