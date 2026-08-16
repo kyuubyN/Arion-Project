@@ -96,6 +96,7 @@ type ProviderInstallation struct {
 }
 
 type AppSettings struct {
+	Language      string                 `json:"language"`
 	DefaultPlayer string                 `json:"default_player"`
 	MediaRoots    []string               `json:"media_roots"`
 	Providers     []ProviderInstallation `json:"providers"`

@@ -3,8 +3,451 @@
 (() => {
   'use strict';
 
+  const TRANSLATIONS = {
+    en: {
+      app: { title: 'Arion — Media Gallery' },
+      brand: { subtitle: 'MEDIA GALLERY' },
+      nav: {
+        ariaLabel: 'Main navigation',
+        home: 'Home',
+        library: 'Library',
+        web: 'Web Videos',
+        personal: 'Personal Videos',
+        providers: 'Providers',
+        settings: 'Settings',
+        detail: 'Collection'
+      },
+      privacy: {
+        localAndPrivate: 'Local and private',
+        telemetryDisabled: 'Telemetry disabled'
+      },
+      search: {
+        placeholder: 'Search library and providers',
+        inYourLibrary: 'IN YOUR LIBRARY',
+        configuredProviders: 'CONFIGURED PROVIDERS',
+        searching: 'SEARCHING…',
+        loadingSources: 'Checking available sources…',
+        noResults: 'Nothing found in library or providers.',
+        emptyLibrary: 'Nothing found in library',
+        localItemCount: '{count} item(s) • In your library',
+        providerSources: '{count} source(s) found',
+        adding: 'Adding…',
+        addedToLibrary: '"{title}" was added to the library.'
+      },
+      home: {
+        heroLabel: 'YOUR MEDIA. YOUR SPACE.',
+        heroTitle: 'A gallery built for what is yours.',
+        heroDesc: 'Organize personal videos and sources chosen by you without uploading your library to the cloud.',
+        addFolder: 'Add folder',
+        addProvider: 'Add provider',
+        recentEyebrow: 'RECENT',
+        recentTitle: 'Your collections',
+        viewLibrary: 'View library'
+      },
+      library: {
+        title: 'All collections',
+        desc: 'Local folders, web collections and providers appear in the same place.',
+        emptyTitle: 'Your gallery is empty',
+        emptyDesc: 'Add a video folder to get started.',
+        chooseFolder: 'Choose folder'
+      },
+      web: {
+        title: 'Choose where to watch',
+        desc: 'Remote sites will run in separate Chromium sessions from your library.',
+        back: 'Back',
+        forward: 'Forward',
+        reload: 'Reload',
+        home: 'Home',
+        isolatedState: 'Isolated Chromium',
+        clearSession: 'Clear session data',
+        selectPlatform: 'Select a platform',
+        platformNotice: 'The site will open in this space without access to the file system or backend.',
+        privacyTitle: 'Transparent privacy',
+        privacyDesc: 'Arion isolates sites from the local library. Platforms themselves may still log your activity while you use them.',
+        youtubeIsolated: 'YouTube • isolated session',
+        tiktokIsolated: 'TikTok • isolated session',
+        notRunning: 'Chromium shell not started',
+        loading: 'Loading…',
+        isolatedSession: 'Isolated session',
+        openPlatformFirst: 'Open a platform first.',
+        dataCleared: 'Platform cookies and storage have been cleared.',
+        shellRequired: 'Open Arion through the Chromium shell to use Web Videos.'
+      },
+      personal: {
+        eyebrow: 'LOCAL LIBRARY',
+        title: 'Personal videos',
+        desc: 'You choose the folders. Nothing is copied, moved, or uploaded.',
+        addFolderTitle: 'Add media folder',
+        addFolderDesc: 'First-level folders will be organized as collections.',
+        readOnlyBadge: 'Read-only',
+        pathPlaceholder: '/home/user/Videos',
+        scanButton: 'Scan folder',
+        indexingTitle: 'Indexing...',
+        indexedEyebrow: 'INDEXED',
+        authorizedFolders: 'Authorized folders',
+        emptyIndexed: 'No indexed folders',
+        chooseFolderToast: 'Choose a folder to index.',
+        indexingRunning: 'Indexing your library…',
+        indexingIncomplete: 'Incomplete indexing',
+        indexingUpdated: 'Library updated',
+        runningCopy: '{indexed} of {found} file(s) processed',
+        updatedCopy: '{count} video(s) found',
+        updatedToast: 'Local library updated.'
+      },
+      providers: {
+        extensibleEyebrow: 'EXTENSIBLE & NEUTRAL',
+        mediaProvidersTitle: 'Media providers',
+        neutralDesc: 'Arion neither offers nor recommends sources. It only recognizes compatible manifests chosen by you.',
+        findInFolder: 'Find provider in a folder',
+        findInFolderDesc: 'We will look for arion-provider.json with limited depth.',
+        protocolBadge: 'Protocol 1',
+        pathPlaceholder: '/path/to/provider',
+        scanFolderButton: 'Scan folder',
+        addSourcesTitle: 'Add sources and catalogs',
+        addSourcesDesc: 'Arion uses neutral manifests and isolated connectors. No default sources are built-in.',
+        optionAEyebrow: 'OPTION A — LOCAL PROVIDERS',
+        optionATitle: 'Providers on your computer',
+        optionADesc: 'Discover local executables containing the arion-provider.json manifest.',
+        folderLabel: 'Providers folder',
+        localFolderPlaceholder: '/home/user/.arion/providers or C:\\arion\\providers',
+        searchLocalButton: 'Search local providers',
+        optionBEyebrow: 'OPTION B — WEB PROVIDERS',
+        optionBTitle: 'Connect website via HTTPS address',
+        optionBDesc: 'Connect websites that publish a neutral manifest at /.well-known/arion-provider.json.',
+        websiteLabel: 'Website address',
+        websitePlaceholder: 'https://example.com',
+        verifyManifestButton: 'Verify website manifest',
+        manageEyebrow: 'MANAGE PROVIDERS',
+        installedTitle: 'Installed providers',
+        activate: 'Activate',
+        addDisabled: 'Add disabled',
+        added: 'Provider added.',
+        enterPath: 'Enter the provider folder.',
+        noManifestFound: 'No compatible manifest was found.',
+        enterWebUrl: 'Enter the HTTPS address of the website.',
+        probingWebManifest: 'Checking the public website manifest…',
+        incompatibleWeb: 'This website does not expose a compatible integration and was not activated.',
+        activateWebsite: 'Activate website',
+        activatedWeb: 'Compatible website activated as provider.',
+        websiteHttps: 'Website HTTPS',
+        localProcess: 'Local process',
+        active: 'Active',
+        waitingExecutable: 'Awaiting executable',
+        check: 'Check',
+        inactive: 'Inactive',
+        remove: 'Remove',
+        removeAria: 'Remove provider',
+        noneConfigured: 'No providers configured',
+        statusState: 'Status: {status}',
+        removedToast: 'Provider removed. Already imported collections have been preserved.'
+      },
+      settings: {
+        controlEyebrow: 'CONTROL',
+        title: 'Settings and privacy',
+        desc: 'Explicit choices, no hidden settings.',
+        language: 'Interface language',
+        languageDesc: 'Select your preferred display language.',
+        webSessionsTitle: 'Web Videos sessions',
+        webSessionsDesc: 'Private clears data upon exit; persistent preserves logins.',
+        modePrivate: 'Private',
+        modePersistent: 'Persistent',
+        keepHistoryTitle: 'Keep web history',
+        keepHistoryDesc: 'Saves only URLs visited inside Arion.',
+        telemetryTitle: 'Telemetry',
+        telemetryDesc: 'Arion has no telemetry transport.',
+        defaultPlayerTitle: 'Default player',
+        defaultPlayerDesc: 'Player used for local videos.',
+        playerIntegrated: 'Integrated',
+        saveButton: 'Save settings',
+        dataStorageTitle: 'Data stored on this computer',
+        dataStorageDesc: 'Arion uses the configuration and cache folders of your profile. On Linux: ~/.config/arion and ~/.cache/arion. On Windows: %APPDATA%\\arion and %LOCALAPPDATA%\\arion.',
+        saved: 'Settings saved.'
+      },
+      detail: {
+        localCollection: 'LOCAL COLLECTION',
+        providerCollection: 'PROVIDER COLLECTION',
+        itemCount: '{count} item(s) • {source}',
+        headerTitle: 'TITLE',
+        headerDuration: 'DURATION',
+        noVideos: 'This collection has no videos'
+      },
+      media: {
+        localVideo: 'Local video',
+        providerMedia: 'Provider media',
+        watched: ' • Watched',
+        inProgress: ' • In progress'
+      },
+      card: {
+        onThisComputer: 'On this computer',
+        videoCount: '{count} video(s) • {source}',
+        emptyHome: 'No collections yet'
+      },
+      stats: {
+        collections: 'Collections',
+        localVideos: 'Local videos',
+        watched: 'Watched'
+      },
+      audio: {
+        dubbed: 'Dubbed',
+        subbed: 'Subtitled'
+      },
+      player: {
+        nowPlaying: 'NOW PLAYING',
+        openExternal: 'Open in external player',
+        loadingVideo: 'Loading video: {title}…',
+        playing: 'Playing {title}',
+        startedExternal: 'Playback started in {player}.',
+        externalPlayer: 'external player',
+        sentToExternal: 'Video sent to external player.',
+        copiedTitle: 'Title copied to clipboard.'
+      },
+      itemModal: {
+        eyebrow: 'MEDIA OPTIONS',
+        episodeDefault: 'Episode',
+        playEpisode: 'Play Episode',
+        downloadFile: 'Download file to computer',
+        copyTitle: 'Copy Title'
+      },
+      download: {
+        default: 'Downloading file...',
+        starting: 'Starting download of "{title}"...',
+        downloadingTitle: 'Downloading {title}...',
+        complete: 'Download complete',
+        completedToast: 'Download of "{title}" completed and saved to local library.',
+        error: 'Error downloading video.'
+      },
+      common: {
+        back: 'Back',
+        close: 'Close',
+        errorPrefix: 'Error {status}',
+        secureLauncherRequired: 'Open Arion through the secure launcher.'
+      }
+    },
+    'pt-BR': {
+      app: { title: 'Arion — Galeria de mídia' },
+      brand: { subtitle: 'GALERIA DE MÍDIA' },
+      nav: {
+        ariaLabel: 'Navegação principal',
+        home: 'Início',
+        library: 'Biblioteca',
+        web: 'Web Videos',
+        personal: 'Vídeos pessoais',
+        providers: 'Provedores',
+        settings: 'Configurações',
+        detail: 'Coleção'
+      },
+      privacy: {
+        localAndPrivate: 'Local e privado',
+        telemetryDisabled: 'Telemetria desativada'
+      },
+      search: {
+        placeholder: 'Buscar na biblioteca e provedores',
+        inYourLibrary: 'NA SUA BIBLIOTECA',
+        configuredProviders: 'PROVEDORES CONFIGURADOS',
+        searching: 'BUSCANDO…',
+        loadingSources: 'Consultando as fontes disponíveis…',
+        noResults: 'Nada encontrado na biblioteca ou nos provedores.',
+        emptyLibrary: 'Nada encontrado na biblioteca',
+        localItemCount: '{count} item(ns) • Na sua biblioteca',
+        providerSources: '{count} fonte(s) encontrada(s)',
+        adding: 'Adicionando…',
+        addedToLibrary: '"{title}" foi adicionado à biblioteca.'
+      },
+      home: {
+        heroLabel: 'SUA MÍDIA. SEU ESPAÇO.',
+        heroTitle: 'Uma galeria feita para o que é seu.',
+        heroDesc: 'Organize vídeos pessoais e fontes escolhidas por você sem enviar sua biblioteca para a nuvem.',
+        addFolder: 'Adicionar pasta',
+        addProvider: 'Adicionar provedor',
+        recentEyebrow: 'RECENTES',
+        recentTitle: 'Suas coleções',
+        viewLibrary: 'Ver biblioteca'
+      },
+      library: {
+        title: 'Todas as coleções',
+        desc: 'Pastas locais, coleções web e provedores aparecem no mesmo lugar.',
+        emptyTitle: 'Sua galeria está vazia',
+        emptyDesc: 'Adicione uma pasta de vídeos para começar.',
+        chooseFolder: 'Escolher pasta'
+      },
+      web: {
+        title: 'Escolha onde assistir',
+        desc: 'Sites remotos serão executados em sessões Chromium separadas da sua biblioteca.',
+        back: 'Voltar',
+        forward: 'Avançar',
+        reload: 'Atualizar',
+        home: 'Início',
+        isolatedState: 'Chromium isolado',
+        clearSession: 'Limpar dados da sessão',
+        selectPlatform: 'Selecione uma plataforma',
+        platformNotice: 'O site será aberto neste espaço sem acesso ao sistema de arquivos ou ao backend.',
+        privacyTitle: 'Privacidade transparente',
+        privacyDesc: 'O Arion isola os sites da biblioteca local. As próprias plataformas ainda podem registrar sua atividade enquanto você as utiliza.',
+        youtubeIsolated: 'YouTube • sessão isolada',
+        tiktokIsolated: 'TikTok • sessão isolada',
+        notRunning: 'Shell Chromium não iniciado',
+        loading: 'Carregando…',
+        isolatedSession: 'Sessão isolada',
+        openPlatformFirst: 'Abra uma plataforma primeiro.',
+        dataCleared: 'Cookies e armazenamento da plataforma foram apagados.',
+        shellRequired: 'Abra o Arion pelo shell Chromium para usar Web Videos.'
+      },
+      personal: {
+        eyebrow: 'BIBLIOTECA LOCAL',
+        title: 'Vídeos pessoais',
+        desc: 'Você escolhe as pastas. Nada é copiado, movido ou enviado.',
+        addFolderTitle: 'Adicionar pasta de mídia',
+        addFolderDesc: 'Pastas de primeiro nível serão organizadas como coleções.',
+        readOnlyBadge: 'Somente leitura',
+        pathPlaceholder: '/home/usuario/Vídeos',
+        scanButton: 'Indexar pasta',
+        indexingTitle: 'Indexando...',
+        indexedEyebrow: 'INDEXADAS',
+        authorizedFolders: 'Pastas autorizadas',
+        emptyIndexed: 'Nenhuma pasta indexada',
+        chooseFolderToast: 'Escolha uma pasta para indexar.',
+        indexingRunning: 'Indexando sua biblioteca…',
+        indexingIncomplete: 'Indexação incompleta',
+        indexingUpdated: 'Biblioteca atualizada',
+        runningCopy: '{indexed} de {found} arquivo(s) processados',
+        updatedCopy: '{count} vídeo(s) encontrado(s)',
+        updatedToast: 'Biblioteca local atualizada.'
+      },
+      providers: {
+        extensibleEyebrow: 'EXTENSÍVEL E NEUTRO',
+        mediaProvidersTitle: 'Provedores de mídia',
+        neutralDesc: 'O Arion não oferece nem recomenda fontes. Ele reconhece apenas manifestos compatíveis escolhidos por você.',
+        findInFolder: 'Encontrar provedor em uma pasta',
+        findInFolderDesc: 'Procuraremos por arion-provider.json com profundidade limitada.',
+        protocolBadge: 'Protocolo 1',
+        pathPlaceholder: '/caminho/do/provedor',
+        scanFolderButton: 'Verificar pasta',
+        addSourcesTitle: 'Adicionar fontes e catálogos',
+        addSourcesDesc: 'O Arion usa manifestos neutros e conectores isolados. Nenhuma fonte padrão vem embutida.',
+        optionAEyebrow: 'OPÇÃO A — PROVEDORES LOCAIS',
+        optionATitle: 'Provedores no seu computador',
+        optionADesc: 'Descubra executáveis locais contendo o manifesto arion-provider.json.',
+        folderLabel: 'Pasta dos provedores',
+        localFolderPlaceholder: '/home/usuario/.arion/providers ou C:\\arion\\providers',
+        searchLocalButton: 'Buscar provedores locais',
+        optionBEyebrow: 'OPÇÃO B — PROVEDORES WEB',
+        optionBTitle: 'Conectar site por endereço HTTPS',
+        optionBDesc: 'Conecte sites que publiquem um manifesto neutro em /.well-known/arion-provider.json.',
+        websiteLabel: 'Endereço do site',
+        websitePlaceholder: 'https://exemplo.com',
+        verifyManifestButton: 'Verificar manifesto do site',
+        manageEyebrow: 'GERENCIAR PROVEDORES',
+        installedTitle: 'Provedores instalados',
+        activate: 'Ativar',
+        addDisabled: 'Adicionar desativado',
+        added: 'Provedor adicionado.',
+        enterPath: 'Informe a pasta do provedor.',
+        noManifestFound: 'Nenhum manifesto compatível foi encontrado.',
+        enterWebUrl: 'Informe o endereço HTTPS do site.',
+        probingWebManifest: 'Verificando o manifesto público do site…',
+        incompatibleWeb: 'Este site não expõe uma integração compatível e não foi ativado.',
+        activateWebsite: 'Ativar site',
+        activatedWeb: 'Site compatível ativado como provedor.',
+        websiteHttps: 'Website HTTPS',
+        localProcess: 'Processo local',
+        active: 'Ativo',
+        waitingExecutable: 'Aguardando executável',
+        check: 'Verificar',
+        inactive: 'Inativo',
+        remove: 'Remover',
+        removeAria: 'Remover provedor',
+        noneConfigured: 'Nenhum provedor configurado',
+        statusState: 'Estado: {status}',
+        removedToast: 'Provedor removido. As coleções já importadas foram preservadas.'
+      },
+      settings: {
+        controlEyebrow: 'CONTROLE',
+        title: 'Configurações e privacidade',
+        desc: 'Escolhas explícitas, sem configurações escondidas.',
+        language: 'Idioma da interface',
+        languageDesc: 'Selecione o idioma de exibição do aplicativo.',
+        webSessionsTitle: 'Sessões Web Videos',
+        webSessionsDesc: 'Privada apaga dados ao fechar; persistente mantém logins.',
+        modePrivate: 'Privada',
+        modePersistent: 'Persistente',
+        keepHistoryTitle: 'Manter histórico web',
+        keepHistoryDesc: 'Salva apenas endereços visitados dentro do Arion.',
+        telemetryTitle: 'Telemetria',
+        telemetryDesc: 'O Arion não possui transporte de telemetria.',
+        defaultPlayerTitle: 'Player padrão',
+        defaultPlayerDesc: 'Player usado para vídeos locais.',
+        playerIntegrated: 'Integrado',
+        saveButton: 'Salvar configurações',
+        dataStorageTitle: 'Dados armazenados neste computador',
+        dataStorageDesc: 'O Arion usa as pastas de configuração e cache do seu perfil. No Linux: ~/.config/arion e ~/.cache/arion. No Windows: %APPDATA%\\arion e %LOCALAPPDATA%\\arion.',
+        saved: 'Configurações salvas.'
+      },
+      detail: {
+        localCollection: 'COLEÇÃO LOCAL',
+        providerCollection: 'COLEÇÃO DE PROVEDOR',
+        itemCount: '{count} item(ns) • {source}',
+        headerTitle: 'TÍTULO',
+        headerDuration: 'DURAÇÃO',
+        noVideos: 'Esta coleção não possui vídeos'
+      },
+      media: {
+        localVideo: 'Vídeo local',
+        providerMedia: 'Mídia do provedor',
+        watched: ' • Assistido',
+        inProgress: ' • Em andamento'
+      },
+      card: {
+        onThisComputer: 'Neste computador',
+        videoCount: '{count} vídeo(s) • {source}',
+        emptyHome: 'Nenhuma coleção ainda'
+      },
+      stats: {
+        collections: 'Coleções',
+        localVideos: 'Vídeos locais',
+        watched: 'Assistidos'
+      },
+      audio: {
+        dubbed: 'Dublado',
+        subbed: 'Legendado'
+      },
+      player: {
+        nowPlaying: 'REPRODUZINDO',
+        openExternal: 'Abrir no player externo',
+        loadingVideo: 'Carregando vídeo: {title}…',
+        playing: 'Reproduzindo {title}',
+        startedExternal: 'Reprodução iniciada no {player}.',
+        externalPlayer: 'player externo',
+        sentToExternal: 'Vídeo enviado ao player externo.',
+        copiedTitle: 'Título copiado para a área de transferência.'
+      },
+      itemModal: {
+        eyebrow: 'OPÇÕES DE MÍDIA',
+        episodeDefault: 'Episódio',
+        playEpisode: 'Reproduzir Episódio',
+        downloadFile: 'Baixar arquivo para o computador',
+        copyTitle: 'Copiar Título'
+      },
+      download: {
+        default: 'Baixando arquivo...',
+        starting: 'Iniciando download de "{title}"...',
+        downloadingTitle: 'Baixando {title}...',
+        complete: 'Download concluído',
+        completedToast: 'Download de "{title}" concluído e salvo na biblioteca local.',
+        error: 'Erro ao realizar download do vídeo.'
+      },
+      common: {
+        back: 'Voltar',
+        close: 'Fechar',
+        errorPrefix: 'Erro {status}',
+        secureLauncherRequired: 'Abra o Arion pelo inicializador seguro.'
+      }
+    }
+  };
+
   const state = {
     token: new URLSearchParams(location.hash.slice(1)).get('session') || '',
+    language: 'en',
+    currentView: 'home',
     collections: [],
     settings: null,
     activeCollection: null,
@@ -21,6 +464,62 @@
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
 
+  function t(key, params = {}) {
+    const lang = state.language === 'pt-BR' || state.language === 'pt' ? 'pt-BR' : 'en';
+    const resolve = (table, path) => path.split('.').reduce((acc, part) => acc?.[part], table);
+    let val = resolve(TRANSLATIONS[lang], key);
+    if (val === undefined) val = resolve(TRANSLATIONS.en, key);
+    if (val === undefined) return key;
+    return String(val).replace(/\{(\w+)\}/g, (_, k) => params[k] !== undefined ? params[k] : `{${k}}`);
+  }
+
+  function translateDOM() {
+    document.documentElement.lang = state.language === 'pt-BR' ? 'pt-BR' : 'en';
+    document.title = t('app.title');
+    $$('[data-i18n]').forEach(node => {
+      const key = node.dataset.i18n;
+      if (key) node.textContent = t(key);
+    });
+    $$('[data-i18n-placeholder]').forEach(node => {
+      const key = node.dataset.i18nPlaceholder;
+      if (key) node.placeholder = t(key);
+    });
+    $$('[data-i18n-title]').forEach(node => {
+      const key = node.dataset.i18nTitle;
+      if (key) node.title = t(key);
+    });
+    $$('[data-i18n-aria-label]').forEach(node => {
+      const key = node.dataset.i18nAriaLabel;
+      if (key) node.setAttribute('aria-label', t(key));
+    });
+    const pageTitle = $('#page-title');
+    if (pageTitle) pageTitle.textContent = t(`nav.${state.currentView}`) || 'Arion';
+  }
+
+  async function setLanguage(lang, save = false) {
+    const normalized = lang === 'pt-BR' || lang === 'pt' ? 'pt-BR' : 'en';
+    state.language = normalized;
+    const select = $('#setting-language');
+    if (select && select.value !== normalized) select.value = normalized;
+    translateDOM();
+    renderCollections();
+    if (state.currentView === 'detail' && state.activeCollection) {
+      openCollection(state.activeCollection.id);
+    }
+    const query = $('#global-search')?.value.trim();
+    if (query) runGlobalSearch(query);
+    if (save && state.settings) {
+      const next = structuredClone(state.settings);
+      next.language = normalized;
+      try {
+        state.settings = await api('/api/settings', { method: 'POST', body: JSON.stringify(next) });
+        showToast(t('settings.saved'));
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+  }
+
   async function api(path, options = {}) {
     const headers = new Headers(options.headers || {});
     headers.set('Authorization', `Bearer ${state.token}`);
@@ -28,7 +527,7 @@
     const response = await fetch(path, { ...options, headers });
     const type = response.headers.get('content-type') || '';
     const payload = type.includes('application/json') ? await response.json() : await response.text();
-    if (!response.ok) throw new Error(payload?.error || payload || `Erro ${response.status}`);
+    if (!response.ok) throw new Error(payload?.error || payload || t('common.errorPrefix', { status: response.status }));
     return payload;
   }
 
@@ -65,12 +564,11 @@
     showToast.timer = setTimeout(() => toast.classList.add('hidden'), 3400);
   }
 
-  const titles = { home: 'Início', library: 'Biblioteca', web: 'Web Videos', personal: 'Vídeos pessoais', providers: 'Provedores', settings: 'Configurações', detail: 'Coleção' };
-
   function navigate(view) {
+    state.currentView = view;
     $$('.view').forEach(node => node.classList.toggle('active', node.id === `view-${view}`));
     $$('.nav-item').forEach(node => node.classList.toggle('active', node.dataset.view === view));
-    $('#page-title').textContent = titles[view] || 'Arion';
+    $('#page-title').textContent = t(`nav.${view}`) || 'Arion';
     const content = $('.content');
     content.classList.toggle('web-mode', view === 'web');
     content.scrollTop = 0;
@@ -87,10 +585,12 @@
     const first = collection.items?.[0];
     const artwork = artworkURL(collection.artwork_url) || (first?.source_id === 'local' ? mediaURL('/api/media/thumbnail', first.id) : '');
     const art = artwork ? `<img src="${escapeHTML(artwork)}" alt="" loading="lazy">` : '';
+    const sourceLabel = collection.source_id === 'local' ? t('card.onThisComputer') : escapeHTML(collection.source_id);
+    const countLabel = t('card.videoCount', { count: collection.items?.length || 0, source: sourceLabel });
     return `<button class="collection-card" data-collection="${escapeHTML(collection.id)}">
       <span class="collection-art">${art}<span class="art-fallback">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="play-bubble">${PLAY_SVG}</span></span>
       <strong>${escapeHTML(collection.title)}</strong>
-      <small>${collection.items?.length || 0} vídeo(s) • ${collection.source_id === 'local' ? 'Neste computador' : escapeHTML(collection.source_id)}</small>
+      <small>${countLabel}</small>
     </button>`;
   }
 
@@ -105,16 +605,16 @@
 
   function renderCollections() {
     const cards = state.collections.map(collectionCard).join('');
-    $('#home-collections').innerHTML = cards || emptyInline('Nenhuma coleção ainda');
+    $('#home-collections').innerHTML = cards || emptyInline(t('card.emptyHome'));
     $('#library-grid').innerHTML = cards;
     $('#library-empty').classList.toggle('hidden', state.collections.length > 0);
     const personal = state.collections.filter(collection => collection.kind === 'local_folder');
-    $('#personal-collections').innerHTML = personal.map(collectionCard).join('') || emptyInline('Nenhuma pasta indexada');
+    $('#personal-collections').innerHTML = personal.map(collectionCard).join('') || emptyInline(t('personal.emptyIndexed'));
     [$('#home-collections'), $('#library-grid'), $('#personal-collections')].forEach(bindCollectionCards);
 
     const itemCount = state.collections.reduce((sum, collection) => sum + (collection.items?.length || 0), 0);
     const watched = state.collections.reduce((sum, collection) => sum + (collection.items || []).filter(item => item.watched).length, 0);
-    $('#home-stats').innerHTML = `<article><strong>${state.collections.length}</strong><span>Coleções</span></article><article><strong>${itemCount}</strong><span>Vídeos locais</span></article><article><strong>${watched}</strong><span>Assistidos</span></article>`;
+    $('#home-stats').innerHTML = `<article><strong>${state.collections.length}</strong><span>${t('stats.collections')}</span></article><article><strong>${itemCount}</strong><span>${t('stats.localVideos')}</span></article><article><strong>${watched}</strong><span>${t('stats.watched')}</span></article>`;
   }
 
   function emptyInline(text) {
@@ -125,7 +625,7 @@
     const merged = new Map();
     for (const source of sources || []) {
       for (const item of source.items || []) {
-        const key = item.title.toLocaleLowerCase('pt-BR').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
+        const key = item.title.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
         let target = merged.get(key);
         if (!target) {
           target = { ...item, variants: [] };
@@ -146,7 +646,7 @@
   }
 
   function variantLabel(variant) {
-    const audio = (variant.audio || []).map(value => value === 'dubbed' ? 'Dublado' : value === 'subbed' ? 'Legendado' : value);
+    const audio = (variant.audio || []).map(value => value === 'dubbed' ? t('audio.dubbed') : value === 'subbed' ? t('audio.subbed') : value);
     const details = [...(variant.languages || []), ...audio];
     return `${variant.label}${details.length ? ` • ${details.join(' • ')}` : ''}`;
   }
@@ -157,14 +657,14 @@
       popover.classList.add('hidden');
       return;
     }
-    const localHTML = localMatches.slice(0, 5).map(collection => `<button class="search-result-row" data-search-collection="${escapeHTML(collection.id)}"><span class="search-result-art">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(collection.title)}</strong><small>${collection.items?.length || 0} item(ns) • Na sua biblioteca</small></span><span>></span></button>`).join('');
+    const localHTML = localMatches.slice(0, 5).map(collection => `<button class="search-result-row" data-search-collection="${escapeHTML(collection.id)}"><span class="search-result-art">${escapeHTML(collection.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(collection.title)}</strong><small>${t('search.localItemCount', { count: collection.items?.length || 0 })}</small></span><span>></span></button>`).join('');
     const providerHTML = state.providerMatches.map((item, itemIndex) => {
       const artwork = artworkURL(item.artwork_url);
       const variants = item.variants.map((variant, variantIndex) => `<button class="search-variant" data-provider-match="${itemIndex}" data-provider-variant="${variantIndex}">+ ${escapeHTML(variantLabel(variant))}</button>`).join('');
-      return `<article class="search-provider-result"><div class="search-provider-main"><span class="search-result-art">${artwork ? `<img src="${escapeHTML(artwork)}" alt="" loading="lazy">` : escapeHTML(item.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(item.title)}</strong><small>${item.variants.length} fonte(s) encontrada(s)</small></span></div><div class="search-variants">${variants}</div></article>`;
+      return `<article class="search-provider-result"><div class="search-provider-main"><span class="search-result-art">${artwork ? `<img src="${escapeHTML(artwork)}" alt="" loading="lazy">` : escapeHTML(item.title.slice(0, 1).toUpperCase())}</span><span class="search-result-copy"><strong>${escapeHTML(item.title)}</strong><small>${t('search.providerSources', { count: item.variants.length })}</small></span></div><div class="search-variants">${variants}</div></article>`;
     }).join('');
     const hasResults = localMatches.length > 0 || state.providerMatches.length > 0;
-    popover.innerHTML = `${localHTML ? `<section class="search-popover-section"><div class="search-popover-heading"><span>NA SUA BIBLIOTECA</span><span>${localMatches.length}</span></div>${localHTML}</section>` : ''}${providerHTML || loading ? `<section class="search-popover-section"><div class="search-popover-heading"><span>PROVEDORES CONFIGURADOS</span><span>${loading ? 'BUSCANDO…' : state.providerMatches.length}</span></div>${providerHTML}${loading ? '<div class="search-loading">Consultando as fontes disponíveis…</div>' : ''}</section>` : ''}${!hasResults && !loading ? '<div class="search-no-results">Nada encontrado na biblioteca ou nos provedores.</div>' : ''}`;
+    popover.innerHTML = `${localHTML ? `<section class="search-popover-section"><div class="search-popover-heading"><span>${t('search.inYourLibrary')}</span><span>${localMatches.length}</span></div>${localHTML}</section>` : ''}${providerHTML || loading ? `<section class="search-popover-section"><div class="search-popover-heading"><span>${t('search.configuredProviders')}</span><span>${loading ? t('search.searching') : state.providerMatches.length}</span></div>${providerHTML}${loading ? `<div class="search-loading">${t('search.loadingSources')}</div>` : ''}</section>` : ''}${!hasResults && !loading ? `<div class="search-no-results">${t('search.noResults')}</div>` : ''}`;
     popover.classList.remove('hidden');
     popover.querySelectorAll('[data-search-collection]').forEach(button => button.addEventListener('click', () => {
       popover.classList.add('hidden');
@@ -179,16 +679,16 @@
     const variant = item?.variants?.[variantIndex];
     if (!variant) return;
     button.disabled = true;
-    button.textContent = 'Adicionando…';
+    button.textContent = t('search.adding');
     try {
       const collection = await api('/api/providers/import', { method: 'POST', body: JSON.stringify({ provider_id: variant.provider_id, reference: variant.reference }) });
       await loadCollections();
       $('#global-search-results').classList.add('hidden');
-      showToast(`${collection.title} foi adicionado à biblioteca.`);
+      showToast(t('search.addedToLibrary', { title: collection.title }));
       openCollection(collection.id);
     } catch (error) {
       button.disabled = false;
-      button.textContent = `＋ ${variantLabel(variant)}`;
+      button.textContent = `+ ${variantLabel(variant)}`;
       showToast(error.message, true);
     }
   }
@@ -197,9 +697,9 @@
     const query = rawQuery.trim();
     clearTimeout(state.searchTimer);
     state.searchAbortController?.abort();
-    const normalized = query.toLocaleLowerCase('pt-BR');
-    const localMatches = query ? state.collections.filter(collection => collection.title.toLocaleLowerCase('pt-BR').includes(normalized) || collection.items.some(item => item.title.toLocaleLowerCase('pt-BR').includes(normalized))) : state.collections;
-    $('#library-grid').innerHTML = localMatches.map(collectionCard).join('') || emptyInline('Nada encontrado na biblioteca');
+    const normalized = query.toLowerCase();
+    const localMatches = query ? state.collections.filter(collection => collection.title.toLowerCase().includes(normalized) || collection.items.some(item => item.title.toLowerCase().includes(normalized))) : state.collections;
+    $('#library-grid').innerHTML = localMatches.map(collectionCard).join('') || emptyInline(t('search.emptyLibrary'));
     bindCollectionCards($('#library-grid'));
     state.providerMatches = [];
     if (!query) {
@@ -250,11 +750,19 @@
     state.activeCollection = collection;
     const detailArtwork = artworkURL(collection.artwork_url) || (collection.items?.[0]?.source_id === 'local' ? mediaURL('/api/media/thumbnail', collection.items[0].id) : '');
     const descriptionHTML = collection.description ? `<p style="margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; max-width:750px;">${escapeHTML(collection.description)}</p>` : '';
-    $('#detail-header').innerHTML = `<div class="detail-art">${detailArtwork ? `<img src="${escapeHTML(detailArtwork)}" alt="">` : ''}<span>${escapeHTML(collection.title.slice(0, 1))}</span></div><div><small>${collection.kind === 'local_folder' ? 'COLEÇÃO LOCAL' : 'COLEÇÃO DE PROVEDOR'}</small><h2>${escapeHTML(collection.title)}</h2><p style="font-weight:600;">${collection.items.length} item(ns) • ${escapeHTML(collection.root_path || collection.source_id)}</p>${descriptionHTML}</div>`;
-    $('#media-list').innerHTML = collection.items.map((item, index) => `<div class="media-row">
-      <button class="media-main" data-play="${escapeHTML(item.id)}"><span class="media-index">${index + 1}</span><span class="media-thumb">${item.source_id === 'local' ? `<img src="${mediaURL('/api/media/thumbnail', item.id)}" alt="">` : ''}<i>${PLAY_SVG}</i></span><span><strong>${escapeHTML(item.title)}</strong><small>${item.source_id === 'local' ? (item.width ? `${item.width}×${item.height}` : 'Vídeo local') : 'Mídia do provedor'}${item.watched ? ' • Assistido' : item.playback_time ? ' • Em andamento' : ''}</small></span></button>
-      <span>${formatDuration(item.duration_seconds)}</span><button class="icon-button" data-more="${escapeHTML(item.id)}">•••</button>
-    </div>`).join('') || emptyInline('Esta coleção não possui vídeos');
+    const kindBadge = collection.kind === 'local_folder' ? t('detail.localCollection') : t('detail.providerCollection');
+    const countInfo = t('detail.itemCount', { count: collection.items.length, source: escapeHTML(collection.root_path || collection.source_id) });
+
+    $('#detail-header').innerHTML = `<div class="detail-art">${detailArtwork ? `<img src="${escapeHTML(detailArtwork)}" alt="">` : ''}<span>${escapeHTML(collection.title.slice(0, 1))}</span></div><div><small>${kindBadge}</small><h2>${escapeHTML(collection.title)}</h2><p style="font-weight:600;">${countInfo}</p>${descriptionHTML}</div>`;
+    $('#media-list').innerHTML = collection.items.map((item, index) => {
+      const typeLabel = item.source_id === 'local' ? (item.width ? `${item.width}×${item.height}` : t('media.localVideo')) : t('media.providerMedia');
+      const statusLabel = item.watched ? t('media.watched') : item.playback_time ? t('media.inProgress') : '';
+      return `<div class="media-row">
+        <button class="media-main" data-play="${escapeHTML(item.id)}"><span class="media-index">${index + 1}</span><span class="media-thumb">${item.source_id === 'local' ? `<img src="${mediaURL('/api/media/thumbnail', item.id)}" alt="">` : ''}<i>${PLAY_SVG}</i></span><span><strong>${escapeHTML(item.title)}</strong><small>${typeLabel}${statusLabel}</small></span></button>
+        <span>${formatDuration(item.duration_seconds)}</span><button class="icon-button" data-more="${escapeHTML(item.id)}">•••</button>
+      </div>`;
+    }).join('') || emptyInline(t('detail.noVideos'));
+
     $$('#media-list [data-play]').forEach(button => button.addEventListener('click', () => playItem(button.dataset.play)));
     $$('#media-list [data-more]').forEach(button => button.addEventListener('click', () => {
       const item = collection.items.find(candidate => candidate.id === button.dataset.more);
@@ -276,15 +784,16 @@
     const floatFill = $('#download-floating-fill');
 
     const clampPct = Math.min(100, Math.max(0, Math.round(percent)));
+    const defaultText = t('download.default');
 
     if (badge && label && fill) {
-      label.textContent = text || 'Baixando arquivo...';
+      label.textContent = text || defaultText;
       if (pctLabel) pctLabel.textContent = `${clampPct}%`;
       fill.style.width = `${clampPct}%`;
       badge.classList.remove('hidden');
     }
     if (floatCard && floatTitle && floatFill) {
-      floatTitle.textContent = text || 'Baixando arquivo...';
+      floatTitle.textContent = text || defaultText;
       if (floatPct) floatPct.textContent = `${clampPct}%`;
       floatFill.style.width = `${clampPct}%`;
       floatCard.classList.remove('hidden');
@@ -299,22 +808,22 @@
   }
 
   async function trackDownloadTask(taskID, itemTitle) {
-    showDownloadProgress(`Baixando ${itemTitle}...`, 0);
+    showDownloadProgress(t('download.downloadingTitle', { title: itemTitle }), 0);
     const interval = setInterval(async () => {
       try {
         const task = await api(`/api/media/download/status?id=${encodeURIComponent(taskID)}`);
         if (task.status === 'downloading') {
-          showDownloadProgress(`Baixando ${itemTitle}...`, task.progress_percent || 0);
+          showDownloadProgress(t('download.downloadingTitle', { title: itemTitle }), task.progress_percent || 0);
         } else if (task.status === 'completed') {
           clearInterval(interval);
-          showDownloadProgress(`Download concluído`, 100);
+          showDownloadProgress(t('download.complete'), 100);
           setTimeout(() => hideDownloadProgress(), 1500);
-          showToast(`Download de "${itemTitle}" concluído e salvo na biblioteca local.`);
+          showToast(t('download.completedToast', { title: itemTitle }));
           await loadCollections();
         } else if (task.status === 'failed') {
           clearInterval(interval);
           hideDownloadProgress();
-          showToast(task.error || 'Erro ao realizar download do vídeo.', true);
+          showToast(task.error || t('download.error'), true);
         }
       } catch (err) {
         clearInterval(interval);
@@ -328,7 +837,7 @@
     if (!item) return;
     state.activeItem = item;
     if (item.source_id !== 'local') {
-      showDownloadProgress(`Carregando vídeo: ${item.title}…`);
+      showDownloadProgress(t('player.loadingVideo', { title: item.title }));
       try {
         const result = await api('/api/providers/play', { method: 'POST', body: JSON.stringify({ item_id: item.id, player: state.settings?.default_player || 'integrated' }) });
         hideDownloadProgress();
@@ -339,9 +848,9 @@
           player.src = streamUrl;
           $('#player-modal').classList.remove('hidden');
           player.play().catch(() => {});
-          showToast(`Reproduzindo ${item.title}`);
+          showToast(t('player.playing', { title: item.title }));
         } else {
-          showToast(`Reprodução iniciada no ${result.player || 'player externo'}.`);
+          showToast(t('player.startedExternal', { player: result.player || t('player.externalPlayer') }));
         }
       } catch (error) {
         hideDownloadProgress();
@@ -382,7 +891,7 @@
 
   async function startIndex() {
     const root = $('#media-root-input').value.trim();
-    if (!root) return showToast('Escolha uma pasta para indexar.', true);
+    if (!root) return showToast(t('personal.chooseFolderToast'), true);
     try {
       await api('/api/index/scan', { method: 'POST', body: JSON.stringify({ roots: [root] }) });
       $('#index-progress').classList.remove('hidden');
@@ -396,12 +905,12 @@
     clearTimeout(state.indexTimer);
     try {
       const status = await api('/api/index/status');
-      $('#index-status-title').textContent = status.running ? 'Indexando sua biblioteca…' : status.last_error ? 'Indexação incompleta' : 'Biblioteca atualizada';
-      $('#index-status-copy').textContent = status.running ? `${status.files_indexed} de ${status.files_found} arquivo(s) processados` : `${status.files_indexed} vídeo(s) encontrado(s)`;
+      $('#index-status-title').textContent = status.running ? t('personal.indexingRunning') : status.last_error ? t('personal.indexingIncomplete') : t('personal.indexingUpdated');
+      $('#index-status-copy').textContent = status.running ? t('personal.runningCopy', { indexed: status.files_indexed, found: status.files_found }) : t('personal.updatedCopy', { count: status.files_indexed });
       if (status.running) state.indexTimer = setTimeout(pollIndex, 900);
       else {
         await loadCollections();
-        if (status.last_error) showToast(status.last_error, true); else showToast('Biblioteca local atualizada.');
+        if (status.last_error) showToast(status.last_error, true); else showToast(t('personal.updatedToast'));
       }
     } catch (error) {
       showToast(error.message, true);
@@ -415,23 +924,24 @@
   }
 
   async function discoverProviders() {
-    const path = $('#provider-root-input').value.trim();
-    if (!path) return showToast('Informe a pasta do provedor.', true);
+    const localInput = $('#provider-root-input-local') || $('#provider-root-input');
+    const path = localInput ? localInput.value.trim() : '';
+    if (!path) return showToast(t('providers.enterPath'), true);
     try {
       const payload = await api('/api/providers/discover', { method: 'POST', body: JSON.stringify({ path }) });
       renderCandidates(payload.candidates || []);
-      if (!payload.candidates?.length) showToast('Nenhum manifesto compatível foi encontrado.', true);
+      if (!payload.candidates?.length) showToast(t('providers.noManifestFound'), true);
     } catch (error) {
       showToast(error.message, true);
     }
   }
 
   function renderCandidates(candidates) {
-    $('#provider-candidates').innerHTML = candidates.map(candidate => `<article class="provider-row"><span class="provider-logo">${escapeHTML(candidate.manifest.name.slice(0, 1))}</span><div><strong>${escapeHTML(candidate.manifest.name)}</strong><small>v${escapeHTML(candidate.manifest.version)} • ${escapeHTML(candidate.status)}</small><code>${escapeHTML(candidate.manifest_path)}</code></div><button class="button ${candidate.ready ? 'primary' : 'secondary'}" data-register="${escapeHTML(candidate.manifest_path)}">${candidate.ready ? 'Ativar' : 'Adicionar desativado'}</button></article>`).join('');
+    $('#provider-candidates').innerHTML = candidates.map(candidate => `<article class="provider-row"><span class="provider-logo">${escapeHTML(candidate.manifest.name.slice(0, 1))}</span><div><strong>${escapeHTML(candidate.manifest.name)}</strong><small>v${escapeHTML(candidate.manifest.version)} • ${escapeHTML(candidate.status)}</small><code>${escapeHTML(candidate.manifest_path)}</code></div><button class="button ${candidate.ready ? 'primary' : 'secondary'}" data-register="${escapeHTML(candidate.manifest_path)}">${candidate.ready ? t('providers.activate') : t('providers.addDisabled')}</button></article>`).join('');
     $$('#provider-candidates [data-register]').forEach(button => button.addEventListener('click', async () => {
       try {
         await api('/api/providers/register', { method: 'POST', body: JSON.stringify({ manifest_path: button.dataset.register }) });
-        showToast('Provedor adicionado.');
+        showToast(t('providers.added'));
         await loadProviders();
       } catch (error) { showToast(error.message, true); }
     }));
@@ -441,14 +951,14 @@
     const input = $('#website-provider-url');
     const button = $('#probe-website-provider');
     const url = input.value.trim();
-    if (!url) return showToast('Informe o endereço HTTPS do site.', true);
+    if (!url) return showToast(t('providers.enterWebUrl'), true);
     button.disabled = true;
-    $('#website-provider-candidate').innerHTML = '<div class="empty-inline">Verificando o manifesto público do site…</div>';
+    $('#website-provider-candidate').innerHTML = `<div class="empty-inline">${t('providers.probingWebManifest')}</div>`;
     try {
       const candidate = await api('/api/providers/web/probe', { method: 'POST', body: JSON.stringify({ url }) });
       renderWebsiteProviderCandidate(candidate);
     } catch (error) {
-      $('#website-provider-candidate').innerHTML = emptyInline('Este site não expõe uma integração compatível e não foi ativado.');
+      $('#website-provider-candidate').innerHTML = emptyInline(t('providers.incompatibleWeb'));
       showToast(error.message, true);
     } finally {
       button.disabled = false;
@@ -457,13 +967,13 @@
 
   function renderWebsiteProviderCandidate(candidate) {
     const container = $('#website-provider-candidate');
-    container.innerHTML = `<article class="provider-row"><span class="provider-logo">${escapeHTML(candidate.manifest.name.slice(0, 1))}</span><div><strong>${escapeHTML(candidate.manifest.name)}</strong><small>Site compatível • v${escapeHTML(candidate.manifest.version)} • ${escapeHTML(candidate.status)}</small><code>${escapeHTML(candidate.origin)}</code></div><button class="button primary" data-register-website="${escapeHTML(candidate.origin)}" data-manifest-fingerprint="${escapeHTML(candidate.fingerprint)}">Ativar site</button></article>`;
+    container.innerHTML = `<article class="provider-row"><span class="provider-logo">${escapeHTML(candidate.manifest.name.slice(0, 1))}</span><div><strong>${escapeHTML(candidate.manifest.name)}</strong><small>Site compatível • v${escapeHTML(candidate.manifest.version)} • ${escapeHTML(candidate.status)}</small><code>${escapeHTML(candidate.origin)}</code></div><button class="button primary" data-register-website="${escapeHTML(candidate.origin)}" data-manifest-fingerprint="${escapeHTML(candidate.fingerprint)}">${t('providers.activateWebsite')}</button></article>`;
     container.querySelector('[data-register-website]').addEventListener('click', async event => {
       const button = event.currentTarget;
       button.disabled = true;
       try {
         await api('/api/providers/web/register', { method: 'POST', body: JSON.stringify({ url: button.dataset.registerWebsite, fingerprint: button.dataset.manifestFingerprint }) });
-        showToast('Site compatível ativado como provedor.');
+        showToast(t('providers.activatedWeb'));
         container.innerHTML = '';
         await loadProviders();
       } catch (error) {
@@ -480,14 +990,14 @@
     $('#installed-providers').innerHTML = providers.map(provider => {
       const website = provider.kind === 'website';
       const location = website ? provider.origin : provider.root_path;
-      const stateLabel = provider.enabled ? 'Ativo' : 'Aguardando executável';
-      return `<article class="provider-row"><span class="provider-logo">${escapeHTML(provider.name.slice(0, 1))}</span><div><strong>${escapeHTML(provider.name)}</strong><small>${website ? 'Website HTTPS' : 'Processo local'} • v${escapeHTML(provider.version)} • ${stateLabel}</small><code>${escapeHTML(location || '')}</code></div><div class="provider-actions">${provider.enabled ? `<button class="button secondary" data-provider-health="${escapeHTML(provider.id)}">Verificar</button>` : '<span class="badge">Inativo</span>'}<button class="button secondary" data-provider-remove="${escapeHTML(provider.id)}" aria-label="Remover provedor">Remover</button></div></article>`;
-    }).join('') || emptyInline('Nenhum provedor configurado');
+      const stateLabel = provider.enabled ? t('providers.active') : t('providers.waitingExecutable');
+      return `<article class="provider-row"><span class="provider-logo">${escapeHTML(provider.name.slice(0, 1))}</span><div><strong>${escapeHTML(provider.name)}</strong><small>${website ? t('providers.websiteHttps') : t('providers.localProcess')} • v${escapeHTML(provider.version)} • ${stateLabel}</small><code>${escapeHTML(location || '')}</code></div><div class="provider-actions">${provider.enabled ? `<button class="button secondary" data-provider-health="${escapeHTML(provider.id)}">${t('providers.check')}</button>` : `<span class="badge">${t('providers.inactive')}</span>`}<button class="button secondary" data-provider-remove="${escapeHTML(provider.id)}" aria-label="${t('providers.removeAria')}">${t('providers.remove')}</button></div></article>`;
+    }).join('') || emptyInline(t('providers.noneConfigured'));
     $$('#installed-providers [data-provider-health]').forEach(button => button.addEventListener('click', async () => {
       button.disabled = true;
       try {
         const health = await api('/api/providers/health', { method: 'POST', body: JSON.stringify({ provider_id: button.dataset.providerHealth }) });
-        showToast(health.message || `Estado: ${health.status}`);
+        showToast(health.message || t('providers.statusState', { status: health.status }));
       } catch (error) { showToast(error.message, true); }
       finally { button.disabled = false; }
     }));
@@ -495,7 +1005,7 @@
       button.disabled = true;
       try {
         await api(`/api/providers?id=${encodeURIComponent(button.dataset.providerRemove)}`, { method: 'DELETE' });
-        showToast('Provedor removido. As coleções já importadas foram preservadas.');
+        showToast(t('providers.removedToast'));
         await loadProviders();
       } catch (error) { showToast(error.message, true); }
       finally { button.disabled = false; }
@@ -504,6 +1014,11 @@
 
   async function loadSettings() {
     state.settings = await api('/api/settings');
+    const lang = state.settings.language || 'en';
+    const normalizedLang = lang === 'pt-BR' || lang === 'pt' ? 'pt-BR' : 'en';
+    $('#setting-language').value = normalizedLang;
+    state.language = normalizedLang;
+    translateDOM();
     $('#web-session-mode').value = state.settings.privacy?.web_session_mode || 'private';
     $('#keep-web-history').checked = Boolean(state.settings.privacy?.keep_web_history);
     $('#default-player').value = state.settings.default_player || 'integrated';
@@ -513,12 +1028,17 @@
 
   async function saveSettings() {
     const next = structuredClone(state.settings || {});
+    next.language = $('#setting-language').value;
     next.default_player = $('#default-player').value;
     next.privacy = { telemetry_enabled: false, web_session_mode: $('#web-session-mode').value, keep_web_history: $('#keep-web-history').checked };
     try {
       state.settings = await api('/api/settings', { method: 'POST', body: JSON.stringify(next) });
+      state.language = next.language;
+      translateDOM();
+      renderCollections();
+      if (state.currentView === 'detail' && state.activeCollection) openCollection(state.activeCollection.id);
       if (window.arionDesktop?.available) await window.arionDesktop.setSessionMode(next.privacy.web_session_mode);
-      showToast('Configurações salvas.');
+      showToast(t('settings.saved'));
     } catch (error) { showToast(error.message, true); }
   }
 
@@ -528,14 +1048,17 @@
     $('#detail-back').addEventListener('click', () => navigate('library'));
     $('#scan-media').addEventListener('click', startIndex);
     $('#discover-providers').addEventListener('click', discoverProviders);
+    const discoverLocalBtn = $('#discover-providers-local');
+    if (discoverLocalBtn) discoverLocalBtn.addEventListener('click', discoverProviders);
     $('#probe-website-provider').addEventListener('click', probeWebsiteProvider);
     $('#website-provider-url').addEventListener('keydown', event => { if (event.key === 'Enter') probeWebsiteProvider(); });
+    $('#setting-language').addEventListener('change', event => setLanguage(event.target.value, false));
     $('#save-settings').addEventListener('click', saveSettings);
     $$('[data-web-platform]').forEach(button => button.addEventListener('click', () => openWebPlatform(button.dataset.webPlatform)));
     $$('[data-web-command]').forEach(button => button.addEventListener('click', () => window.arionDesktop?.navigateWeb(button.dataset.webCommand)));
     $('#clear-web-data').addEventListener('click', async () => {
-      if (!state.webPlatform || !window.arionDesktop?.available) return showToast('Abra uma plataforma primeiro.', true);
-      try { await window.arionDesktop.clearWebData(state.webPlatform); showToast('Cookies e armazenamento da plataforma foram apagados.'); }
+      if (!state.webPlatform || !window.arionDesktop?.available) return showToast(t('web.openPlatformFirst'), true);
+      try { await window.arionDesktop.clearWebData(state.webPlatform); showToast(t('web.dataCleared')); }
       catch (error) { showToast(error.message, true); }
     });
     $('#close-player').addEventListener('click', closePlayer);
@@ -550,7 +1073,7 @@
       closeItemMenu();
       if (!state.activeItem) return;
       const item = state.activeItem;
-      showToast(`Iniciando download de "${item.title}"...`);
+      showToast(t('download.starting', { title: item.title }));
       try {
         const task = await api('/api/media/download', {
           method: 'POST',
@@ -575,12 +1098,12 @@
     $('#action-btn-copy').addEventListener('click', () => {
       closeItemMenu();
       if (!state.activeItem) return;
-      navigator.clipboard.writeText(state.activeItem.title).then(() => showToast('Título copiado para a área de transferência.')).catch(() => {});
+      navigator.clipboard.writeText(state.activeItem.title).then(() => showToast(t('player.copiedTitle'))).catch(() => {});
     });
     $('#open-external-player').addEventListener('click', async () => {
       if (!state.activeItem) return;
       const preferred = state.settings?.default_player;
-      try { await api('/api/player/play', { method: 'POST', body: JSON.stringify({ item_id: state.activeItem.id, player: preferred && preferred !== 'integrated' ? preferred : 'mpv' }) }); showToast('Vídeo enviado ao player externo.'); }
+      try { await api('/api/player/play', { method: 'POST', body: JSON.stringify({ item_id: state.activeItem.id, player: preferred && preferred !== 'integrated' ? preferred : 'mpv' }) }); showToast(t('player.sentToExternal')); }
       catch (error) { showToast(error.message, true); }
     });
     $('#local-player').addEventListener('timeupdate', () => {
@@ -609,7 +1132,7 @@
   }
 
   async function openWebPlatform(platform) {
-    if (!window.arionDesktop?.available) return showToast('Abra o Arion pelo shell Chromium para usar Web Videos.', true);
+    if (!window.arionDesktop?.available) return showToast(t('web.shellRequired'), true);
     try {
       state.webPlatform = platform;
       await window.arionDesktop.openWebPlatform(platform, webSurfaceBounds());
@@ -617,18 +1140,18 @@
         button.classList.toggle('primary', button.dataset.webPlatform === platform);
         button.classList.toggle('secondary', button.dataset.webPlatform !== platform);
       });
-      $('#web-state-label').textContent = platform === 'youtube' ? 'YouTube • sessão isolada' : 'TikTok • sessão isolada';
+      $('#web-state-label').textContent = platform === 'youtube' ? t('web.youtubeIsolated') : t('web.tiktokIsolated');
     } catch (error) { showToast(error.message, true); }
   }
 
   function setupDesktopBridge() {
     if (!window.arionDesktop?.available) {
-      $('#web-state-label').textContent = 'Shell Chromium não iniciado';
+      $('#web-state-label').textContent = t('web.notRunning');
       return;
     }
     window.arionDesktop.onWebState(webState => {
       if (webState.platform !== state.webPlatform) return;
-      $('#web-state-label').textContent = webState.loading ? 'Carregando…' : (webState.title || 'Sessão isolada');
+      $('#web-state-label').textContent = webState.loading ? t('web.loading') : (webState.title || t('web.isolatedSession'));
     });
     const observer = new ResizeObserver(() => {
       if (state.webPlatform && $('#view-web').classList.contains('active')) window.arionDesktop.resizeWebView(webSurfaceBounds()).catch(() => {});
@@ -646,8 +1169,9 @@
   async function boot() {
     setupEvents();
     setupDesktopBridge();
+    translateDOM();
     if (!state.token) {
-      showToast('Abra o Arion pelo inicializador seguro.', true);
+      showToast(t('common.secureLauncherRequired'), true);
       return;
     }
     try {

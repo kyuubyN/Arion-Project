@@ -1,33 +1,33 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Arion — Galeria de mídia</title>
+  <title data-i18n="app.title">Arion — Media Gallery</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
-        <img src="assets/logo-transparent.png" alt="Símbolo Arion">
-        <div><strong>ARION</strong><span>GALERIA DE MÍDIA</span></div>
+        <img src="assets/logo-transparent.png" alt="Arion symbol" data-i18n-title="app.title">
+        <div><strong>ARION</strong><span data-i18n="brand.subtitle">MEDIA GALLERY</span></div>
       </div>
 
-      <nav class="nav" aria-label="Navegação principal">
-        <button class="nav-item active" data-view="home"><span>⌂</span> Início</button>
-        <button class="nav-item" data-view="library"><span>▦</span> Biblioteca</button>
-        <button class="nav-item" data-view="web"><span>◎</span> Web Videos</button>
-        <button class="nav-item" data-view="personal"><span>▶</span> Vídeos pessoais</button>
-        <button class="nav-item" data-view="providers"><span>◇</span> Provedores</button>
+      <nav class="nav" aria-label="Main navigation" data-i18n-aria-label="nav.ariaLabel">
+        <button class="nav-item active" data-view="home"><span>⌂</span> <span data-i18n="nav.home">Home</span></button>
+        <button class="nav-item" data-view="library"><span>▦</span> <span data-i18n="nav.library">Library</span></button>
+        <button class="nav-item" data-view="web"><span>◎</span> <span data-i18n="nav.web">Web Videos</span></button>
+        <button class="nav-item" data-view="personal"><span>▶</span> <span data-i18n="nav.personal">Personal Videos</span></button>
+        <button class="nav-item" data-view="providers"><span>◇</span> <span data-i18n="nav.providers">Providers</span></button>
       </nav>
 
       <div class="sidebar-bottom">
-        <button class="nav-item" data-view="settings"><span>⚙</span> Configurações</button>
+        <button class="nav-item" data-view="settings"><span>⚙</span> <span data-i18n="nav.settings">Settings</span></button>
         <div class="privacy-card">
           <span class="privacy-dot"></span>
-          <div><strong>Local e privado</strong><small>Telemetria desativada</small></div>
+          <div><strong data-i18n="privacy.localAndPrivate">Local and private</strong><small data-i18n="privacy.telemetryDisabled">Telemetry disabled</small></div>
         </div>
       </div>
     </aside>
@@ -36,11 +36,11 @@
       <header class="topbar">
         <div>
           <small class="eyebrow">ARION</small>
-          <h1 id="page-title">Início</h1>
+          <h1 id="page-title">Home</h1>
         </div>
         <div id="download-progress-badge" class="download-progress-container hidden">
           <div class="download-info">
-            <span id="download-progress-text">Baixando arquivo...</span>
+            <span id="download-progress-text" data-i18n="download.default">Downloading file...</span>
             <span id="download-progress-percent">0%</span>
           </div>
           <div class="progress-bar-shell">
@@ -50,7 +50,7 @@
         <div class="global-search-shell">
           <label class="search-box">
             <span>⌕</span>
-            <input id="global-search" type="search" placeholder="Buscar na biblioteca e provedores" autocomplete="off">
+            <input id="global-search" type="search" placeholder="Search library and providers" data-i18n-placeholder="search.placeholder" autocomplete="off">
             <kbd>Ctrl K</kbd>
           </label>
           <div id="global-search-results" class="search-popover hidden" role="listbox"></div>
@@ -61,125 +61,235 @@
         <section id="view-home" class="view active">
           <div class="hero">
             <div class="hero-copy">
-              <span class="hero-label">SUA MÍDIA. SEU ESPAÇO.</span>
-              <h2>Uma galeria feita para o que é seu.</h2>
-              <p>Organize vídeos pessoais e fontes escolhidas por você sem enviar sua biblioteca para a nuvem.</p>
+              <span class="hero-label" data-i18n="home.heroLabel">YOUR MEDIA. YOUR SPACE.</span>
+              <h2 data-i18n="home.heroTitle">A gallery built for what is yours.</h2>
+              <p data-i18n="home.heroDesc">Organize personal videos and sources chosen by you without uploading your library to the cloud.</p>
               <div class="button-row">
-                <button class="button primary" data-go="personal">Adicionar pasta</button>
-                <button class="button secondary" data-go="providers">Adicionar provedor</button>
+                <button class="button primary" data-go="personal" data-i18n="home.addFolder">Add folder</button>
+                <button class="button secondary" data-go="providers" data-i18n="home.addProvider">Add provider</button>
               </div>
             </div>
             <div class="hero-mark" aria-hidden="true">A</div>
           </div>
 
           <div id="home-stats" class="stats"></div>
-          <div class="section-heading"><div><small>RECENTES</small><h2>Suas coleções</h2></div><button class="text-button" data-go="library">Ver biblioteca</button></div>
+          <div class="section-heading">
+            <div><small data-i18n="home.recentEyebrow">RECENT</small><h2 data-i18n="home.recentTitle">Your collections</h2></div>
+            <button class="text-button" data-go="library" data-i18n="home.viewLibrary">View library</button>
+          </div>
           <div id="home-collections" class="collection-grid"></div>
         </section>
 
         <section id="view-library" class="view">
-          <div class="page-intro"><small>BIBLIOTECA</small><h2>Todas as coleções</h2><p>Pastas locais, coleções web e provedores aparecem no mesmo lugar.</p></div>
-          <div id="library-empty" class="empty hidden"><strong>Sua galeria está vazia</strong><span>Adicione uma pasta de vídeos para começar.</span><button class="button primary" data-go="personal">Escolher pasta</button></div>
+          <div class="page-intro">
+            <small data-i18n="nav.library">LIBRARY</small>
+            <h2 data-i18n="library.title">All collections</h2>
+            <p data-i18n="library.desc">Local folders, web collections and providers appear in the same place.</p>
+          </div>
+          <div id="library-empty" class="empty hidden">
+            <strong data-i18n="library.emptyTitle">Your gallery is empty</strong>
+            <span data-i18n="library.emptyDesc">Add a video folder to get started.</span>
+            <button class="button primary" data-go="personal" data-i18n="library.chooseFolder">Choose folder</button>
+          </div>
           <div id="library-grid" class="collection-grid"></div>
         </section>
 
         <section id="view-web" class="view">
-          <div class="page-intro"><small>WEB VIDEOS</small><h2>Escolha onde assistir</h2><p>Sites remotos serão executados em sessões Chromium separadas da sua biblioteca.</p></div>
+          <div class="page-intro">
+            <small data-i18n="nav.web">WEB VIDEOS</small>
+            <h2 data-i18n="web.title">Choose where to watch</h2>
+            <p data-i18n="web.desc">Remote sites will run in separate Chromium sessions from your library.</p>
+          </div>
           <div class="web-toolbar">
             <div class="web-platforms">
               <button class="button primary" data-web-platform="youtube">▶ YouTube</button>
               <button class="button secondary" data-web-platform="tiktok">♪ TikTok</button>
             </div>
             <div class="web-navigation">
-              <button class="icon-button" data-web-command="back" title="Voltar">←</button>
-              <button class="icon-button" data-web-command="forward" title="Avançar">→</button>
-              <button class="icon-button" data-web-command="reload" title="Atualizar">↻</button>
-              <button class="icon-button" data-web-command="home" title="Início">⌂</button>
+              <button class="icon-button" data-web-command="back" title="Back" data-i18n-title="web.back">←</button>
+              <button class="icon-button" data-web-command="forward" title="Forward" data-i18n-title="web.forward">→</button>
+              <button class="icon-button" data-web-command="reload" title="Reload" data-i18n-title="web.reload">↻</button>
+              <button class="icon-button" data-web-command="home" title="Home" data-i18n-title="web.home">⌂</button>
             </div>
-            <span id="web-state-label" class="web-state-label">Chromium isolado</span>
-            <button id="clear-web-data" class="text-button">Limpar dados da sessão</button>
+            <span id="web-state-label" class="web-state-label" data-i18n="web.isolatedState">Isolated Chromium</span>
+            <button id="clear-web-data" class="text-button" data-i18n="web.clearSession">Clear session data</button>
           </div>
-          <div id="web-surface" class="web-surface"><div><strong>Selecione uma plataforma</strong><span>O site será aberto neste espaço sem acesso ao sistema de arquivos ou ao backend.</span></div></div>
-          <div class="notice compact"><strong>Privacidade transparente</strong><p>O Arion isola os sites da biblioteca local. As próprias plataformas ainda podem registrar sua atividade enquanto você as utiliza.</p></div>
+          <div id="web-surface" class="web-surface">
+            <div>
+              <strong data-i18n="web.selectPlatform">Select a platform</strong>
+              <span data-i18n="web.platformNotice">The site will open in this space without access to the file system or backend.</span>
+            </div>
+          </div>
+          <div class="notice compact">
+            <strong data-i18n="web.privacyTitle">Transparent privacy</strong>
+            <p data-i18n="web.privacyDesc">Arion isolates sites from the local library. Platforms themselves may still log your activity while you use them.</p>
+          </div>
         </section>
 
         <section id="view-personal" class="view">
-          <div class="page-intro"><small>BIBLIOTECA LOCAL</small><h2>Vídeos pessoais</h2><p>Você escolhe as pastas. Nada é copiado, movido ou enviado.</p></div>
-          <div class="panel">
-            <div class="panel-heading"><div><h3>Adicionar pasta de mídia</h3><p>Pastas de primeiro nível serão organizadas como coleções.</p></div><span class="badge">Somente leitura</span></div>
-            <div class="path-row"><input id="media-root-input" type="text" placeholder="/home/usuario/Vídeos"><button id="scan-media" class="button primary">Indexar pasta</button></div>
-            <div id="suggested-roots" class="chips"></div>
-            <div id="index-progress" class="progress-panel hidden"><div><strong id="index-status-title">Indexando...</strong><span id="index-status-copy"></span></div><div class="progress-track"><span></span></div></div>
+          <div class="page-intro">
+            <small data-i18n="personal.eyebrow">LOCAL LIBRARY</small>
+            <h2 data-i18n="personal.title">Personal videos</h2>
+            <p data-i18n="personal.desc">You choose the folders. Nothing is copied, moved, or uploaded.</p>
           </div>
-          <div class="section-heading"><div><small>INDEXADAS</small><h2>Pastas autorizadas</h2></div></div>
+          <div class="panel">
+            <div class="panel-heading">
+              <div>
+                <h3 data-i18n="personal.addFolderTitle">Add media folder</h3>
+                <p data-i18n="personal.addFolderDesc">First-level folders will be organized as collections.</p>
+              </div>
+              <span class="badge" data-i18n="personal.readOnlyBadge">Read-only</span>
+            </div>
+            <div class="path-row">
+              <input id="media-root-input" type="text" placeholder="/home/user/Videos" data-i18n-placeholder="personal.pathPlaceholder">
+              <button id="scan-media" class="button primary" data-i18n="personal.scanButton">Scan folder</button>
+            </div>
+            <div id="suggested-roots" class="chips"></div>
+            <div id="index-progress" class="progress-panel hidden">
+              <div>
+                <strong id="index-status-title" data-i18n="personal.indexingTitle">Indexing...</strong>
+                <span id="index-status-copy"></span>
+              </div>
+              <div class="progress-track"><span></span></div>
+            </div>
+          </div>
+          <div class="section-heading">
+            <div>
+              <small data-i18n="personal.indexedEyebrow">INDEXED</small>
+              <h2 data-i18n="personal.authorizedFolders">Authorized folders</h2>
+            </div>
+          </div>
           <div id="personal-collections" class="collection-grid"></div>
         </section>
 
         <section id="view-providers" class="view">
-          <div class="page-intro"><small>EXTENSÍVEL E NEUTRO</small><h2>Provedores de mídia</h2><p>O Arion não oferece nem recomenda fontes. Ele reconhece apenas manifestos compatíveis escolhidos por você.</p></div>
+          <div class="page-intro">
+            <small data-i18n="providers.extensibleEyebrow">EXTENSIBLE & NEUTRAL</small>
+            <h2 data-i18n="providers.mediaProvidersTitle">Media providers</h2>
+            <p data-i18n="providers.neutralDesc">Arion neither offers nor recommends sources. It only recognizes compatible manifests chosen by you.</p>
+          </div>
           <div class="panel">
-            <div class="panel-heading"><div><h3>Encontrar provedor em uma pasta</h3><p>Procuraremos por <code>arion-provider.json</code> com profundidade limitada.</p></div><span class="badge">Protocolo 1</span></div>
-            <div class="path-row"><input id="provider-root-input" type="text" placeholder="/caminho/do/provedor"><button id="discover-providers" class="button primary">Verificar pasta</button></div>
+            <div class="panel-heading">
+              <div>
+                <h3 data-i18n="providers.findInFolder">Find provider in a folder</h3>
+                <p data-i18n="providers.findInFolderDesc">We will look for <code>arion-provider.json</code> with limited depth.</p>
+              </div>
+              <span class="badge" data-i18n="providers.protocolBadge">Protocol 1</span>
+            </div>
+            <div class="path-row">
+              <input id="provider-root-input" type="text" placeholder="/path/to/provider" data-i18n-placeholder="providers.pathPlaceholder">
+              <button id="discover-providers" class="button primary" data-i18n="providers.scanFolderButton">Scan folder</button>
+            </div>
           </div>
           <div class="page-intro">
-            <small>PROVEDORES</small>
-            <h2>Adicionar fontes e catálogos</h2>
-            <p>O Arion usa manifestos neutros e conectores isolados. Nenhuma fonte padrão vem embutida.</p>
+            <small data-i18n="nav.providers">PROVIDERS</small>
+            <h2 data-i18n="providers.addSourcesTitle">Add sources and catalogs</h2>
+            <p data-i18n="providers.addSourcesDesc">Arion uses neutral manifests and isolated connectors. No default sources are built-in.</p>
           </div>
 
           <div class="provider-section-grid">
             <div class="index-panel">
-              <small class="eyebrow">OPÇÃO A — PROVEDORES LOCAIS</small>
-              <h3>Provedores no seu computador</h3>
-              <p style="color:var(--muted); font-size:12px;">Descubra executáveis locais contendo o manifesto <code>arion-provider.json</code>.</p>
+              <small class="eyebrow" data-i18n="providers.optionAEyebrow">OPTION A — LOCAL PROVIDERS</small>
+              <h3 data-i18n="providers.optionATitle">Providers on your computer</h3>
+              <p style="color:var(--muted); font-size:12px;" data-i18n="providers.optionADesc">Discover local executables containing the <code>arion-provider.json</code> manifest.</p>
               <label class="input-label">
-                <span>Pasta dos provedores</span>
-                <input id="provider-root-input" type="text" placeholder="/home/usuario/.arion/providers ou C:\arion\providers">
+                <span data-i18n="providers.folderLabel">Providers folder</span>
+                <input id="provider-root-input-local" type="text" placeholder="/home/user/.arion/providers or C:\arion\providers" data-i18n-placeholder="providers.localFolderPlaceholder">
               </label>
-              <button id="discover-providers" class="button secondary">Buscar provedores locais</button>
+              <button id="discover-providers-local" class="button secondary" data-i18n="providers.searchLocalButton">Search local providers</button>
               <div id="provider-candidates" class="provider-candidates"></div>
             </div>
 
             <div class="index-panel">
-              <small class="eyebrow">OPÇÃO B — PROVEDORES WEB</small>
-              <h3>Conectar site por endereço HTTPS</h3>
-              <p style="color:var(--muted); font-size:12px;">Conecte sites que publiquem um manifesto neutro em <code>/.well-known/arion-provider.json</code>.</p>
+              <small class="eyebrow" data-i18n="providers.optionBEyebrow">OPTION B — WEB PROVIDERS</small>
+              <h3 data-i18n="providers.optionBTitle">Connect website via HTTPS address</h3>
+              <p style="color:var(--muted); font-size:12px;" data-i18n="providers.optionBDesc">Connect websites that publish a neutral manifest at <code>/.well-known/arion-provider.json</code>.</p>
               <label class="input-label">
-                <span>Endereço do site</span>
-                <input id="website-provider-url" type="text" placeholder="https://exemplo.com">
+                <span data-i18n="providers.websiteLabel">Website address</span>
+                <input id="website-provider-url" type="text" placeholder="https://example.com" data-i18n-placeholder="providers.websitePlaceholder">
               </label>
-              <button id="probe-website-provider" class="button secondary">Verificar manifesto do site</button>
+              <button id="probe-website-provider" class="button secondary" data-i18n="providers.verifyManifestButton">Verify website manifest</button>
               <div id="website-provider-candidate" class="provider-candidates"></div>
             </div>
           </div>
 
           <div class="page-intro" style="margin-top: 35px;">
-            <small>GERENCIAR PROVEDORES</small>
-            <h3>Provedores instalados</h3>
+            <small data-i18n="providers.manageEyebrow">MANAGE PROVIDERS</small>
+            <h3 data-i18n="providers.installedTitle">Installed providers</h3>
           </div>
           <div id="installed-providers" class="provider-list"></div>
         </section>
 
         <section id="view-settings" class="view">
           <div class="page-intro">
-            <small>CONTROLE</small>
-            <h2>Configurações e privacidade</h2>
-            <p>Escolhas explícitas, sem configurações escondidas.</p>
+            <small data-i18n="settings.controlEyebrow">CONTROL</small>
+            <h2 data-i18n="settings.title">Settings and privacy</h2>
+            <p data-i18n="settings.desc">Explicit choices, no hidden settings.</p>
           </div>
           <div class="settings-list">
-            <label class="setting"><span><strong>Sessões Web Videos</strong><small>Privada apaga dados ao fechar; persistente mantém logins.</small></span><select id="web-session-mode"><option value="private">Privada</option><option value="persistent">Persistente</option></select></label>
-            <label class="setting"><span><strong>Manter histórico web</strong><small>Salva apenas endereços visitados dentro do Arion.</small></span><input id="keep-web-history" type="checkbox"></label>
-            <label class="setting"><span><strong>Telemetria</strong><small>O Arion não possui transporte de telemetria.</small></span><input type="checkbox" disabled></label>
-            <label class="setting"><span><strong>Player padrão</strong><small>Player usado para vídeos locais.</small></span><select id="default-player"><option value="integrated">Integrado</option><option value="mpv">MPV</option><option value="celluloid">Celluloid (Linux)</option></select></label>
-            <div class="setting-action"><button id="save-settings" class="button primary">Salvar configurações</button></div>
+            <label class="setting">
+              <span>
+                <strong data-i18n="settings.language">Interface language</strong>
+                <small data-i18n="settings.languageDesc">Select your preferred display language.</small>
+              </span>
+              <select id="setting-language">
+                <option value="en">English</option>
+                <option value="pt-BR">Português (Brasil)</option>
+              </select>
+            </label>
+            <label class="setting">
+              <span>
+                <strong data-i18n="settings.webSessionsTitle">Web Videos sessions</strong>
+                <small data-i18n="settings.webSessionsDesc">Private clears data upon exit; persistent preserves logins.</small>
+              </span>
+              <select id="web-session-mode">
+                <option value="private" data-i18n="settings.modePrivate">Private</option>
+                <option value="persistent" data-i18n="settings.modePersistent">Persistent</option>
+              </select>
+            </label>
+            <label class="setting">
+              <span>
+                <strong data-i18n="settings.keepHistoryTitle">Keep web history</strong>
+                <small data-i18n="settings.keepHistoryDesc">Saves only URLs visited inside Arion.</small>
+              </span>
+              <input id="keep-web-history" type="checkbox">
+            </label>
+            <label class="setting">
+              <span>
+                <strong data-i18n="settings.telemetryTitle">Telemetry</strong>
+                <small data-i18n="settings.telemetryDesc">Arion has no telemetry transport.</small>
+              </span>
+              <input type="checkbox" disabled>
+            </label>
+            <label class="setting">
+              <span>
+                <strong data-i18n="settings.defaultPlayerTitle">Default player</strong>
+                <small data-i18n="settings.defaultPlayerDesc">Player used for local videos.</small>
+              </span>
+              <select id="default-player">
+                <option value="integrated" data-i18n="settings.playerIntegrated">Integrated</option>
+                <option value="mpv">MPV</option>
+                <option value="celluloid">Celluloid (Linux)</option>
+              </select>
+            </label>
+            <div class="setting-action">
+              <button id="save-settings" class="button primary" data-i18n="settings.saveButton">Save settings</button>
+            </div>
           </div>
-          <div class="notice"><strong>Dados armazenados neste computador</strong><p>O Arion usa as pastas de configuração e cache do seu perfil. No Linux: <code>~/.config/arion</code> e <code>~/.cache/arion</code>. No Windows: <code>%APPDATA%\arion</code> e <code>%LOCALAPPDATA%\arion</code>.</p></div>
+          <div class="notice">
+            <strong data-i18n="settings.dataStorageTitle">Data stored on this computer</strong>
+            <p data-i18n="settings.dataStorageDesc">Arion uses the configuration and cache folders of your profile. On Linux: <code>~/.config/arion</code> and <code>~/.cache/arion</code>. On Windows: <code>%APPDATA%\arion</code> and <code>%LOCALAPPDATA%\arion</code>.</p>
+          </div>
         </section>
 
         <section id="view-detail" class="view">
-          <button id="detail-back" class="text-button">Voltar</button>
+          <button id="detail-back" class="text-button" data-i18n="common.back">Back</button>
           <div id="detail-header" class="detail-header"></div>
-          <div class="list-header"><span>TÍTULO</span><span>DURAÇÃO</span><span></span></div>
+          <div class="list-header">
+            <span data-i18n="detail.headerTitle">TITLE</span>
+            <span data-i18n="detail.headerDuration">DURATION</span>
+            <span></span>
+          </div>
           <div id="media-list" class="media-list"></div>
         </section>
       </main>
@@ -188,22 +298,33 @@
 
   <div id="player-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="player-dialog">
-      <div class="player-head"><div><small>REPRODUZINDO</small><strong id="player-title"></strong></div><button id="close-player" class="icon-button" aria-label="Fechar">x</button></div>
+      <div class="player-head">
+        <div>
+          <small data-i18n="player.nowPlaying">NOW PLAYING</small>
+          <strong id="player-title"></strong>
+        </div>
+        <button id="close-player" class="icon-button" aria-label="Close" data-i18n-aria-label="common.close">x</button>
+      </div>
       <video id="local-player" controls autoplay></video>
-      <div class="player-actions"><button id="open-external-player" class="button secondary">Abrir no player externo</button></div>
+      <div class="player-actions">
+        <button id="open-external-player" class="button secondary" data-i18n="player.openExternal">Open in external player</button>
+      </div>
     </div>
   </div>
 
   <div id="item-action-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="item-action-dialog">
       <div class="item-action-head">
-        <div><small>OPÇÕES DE MÍDIA</small><strong id="item-action-title">Episódio</strong></div>
+        <div>
+          <small data-i18n="itemModal.eyebrow">MEDIA OPTIONS</small>
+          <strong id="item-action-title" data-i18n="itemModal.episodeDefault">Episode</strong>
+        </div>
         <button id="close-item-action" class="icon-button">x</button>
       </div>
       <div class="item-action-options">
-        <button id="action-btn-play" class="button primary">Reproduzir Episódio</button>
-        <button id="action-btn-download" class="button secondary">Baixar arquivo para o computador</button>
-        <button id="action-btn-copy" class="button secondary">Copiar Título</button>
+        <button id="action-btn-play" class="button primary" data-i18n="itemModal.playEpisode">Play Episode</button>
+        <button id="action-btn-download" class="button secondary" data-i18n="itemModal.downloadFile">Download file to computer</button>
+        <button id="action-btn-copy" class="button secondary" data-i18n="itemModal.copyTitle">Copy Title</button>
       </div>
     </div>
   </div>
@@ -212,7 +333,7 @@
 
   <div id="download-floating-card" class="download-floating-card hidden">
     <div class="download-floating-head">
-      <strong id="download-floating-title">Baixando arquivo...</strong>
+      <strong id="download-floating-title" data-i18n="download.default">Downloading file...</strong>
       <span id="download-floating-percent">0%</span>
     </div>
     <div class="progress-bar-shell">

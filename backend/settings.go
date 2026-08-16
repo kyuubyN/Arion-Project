@@ -25,6 +25,7 @@ func NewSettingsStore() (*SettingsStore, error) {
 	store := &SettingsStore{
 		filePath: filepath.Join(dir, "settings-v2.json"),
 		value: AppSettings{
+			Language:      "en",
 			DefaultPlayer: "integrated",
 			MediaRoots:    []string{},
 			Providers:     []ProviderInstallation{},
@@ -98,6 +99,12 @@ func (s *SettingsStore) RemoveProvider(id string) error {
 }
 
 func (s *SettingsStore) normalizeLocked() {
+	if s.value.Language != "en" && s.value.Language != "pt-BR" && s.value.Language != "pt" {
+		s.value.Language = "en"
+	}
+	if s.value.Language == "pt" {
+		s.value.Language = "pt-BR"
+	}
 	if s.value.DefaultPlayer == "" {
 		s.value.DefaultPlayer = "integrated"
 	}
