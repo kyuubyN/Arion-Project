@@ -2,7 +2,7 @@
 
 ## Arion
 
-Projeto e direção: KЯØNE / kyuubyn.
+Projeto e direção: kyuubyn.
 
 A identidade atual, o modelo de galeria neutra, o indexador local e o protocolo de provedores foram desenvolvidos para o Arion.
 
